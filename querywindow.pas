@@ -60,6 +60,7 @@ type
     FindDialog1: TFindDialog;
     bbClose: TSpeedButton;
     FontDialog1: TFontDialog;
+    sbMeQuery: TStatusBar;
     toolbarImages: TImageList;
     imTools: TImageList;
     imTabs: TImageList;
@@ -144,6 +145,7 @@ type
     procedure lmUndoClick(Sender: TObject);
     procedure lmFindClick(Sender: TObject);
     procedure lmFindAgainClick(Sender: TObject);
+    procedure meQueryClick(Sender: TObject);
     procedure meQueryKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
     procedure SQLScript1Exception(Sender: TObject; Statement: TStrings;
@@ -2028,12 +2030,18 @@ begin
   meQuery.SearchReplace(FindDialog1.FindText, '', FOptions);
 end;
 
+procedure TfmQueryWindow.meQueryClick(Sender: TObject);
+begin
+  sbMeQuery.Panels[0].Text:='Column: '+ inttostr(meQuery.CaretX) +' Line: '+ inttostr(meQuery.CaretY);
+end;
+
 
 { Run query by pressing Ctrl + Enter }
 
 procedure TfmQueryWindow.meQueryKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  sbMeQuery.Panels[0].Text:='Column: '+ inttostr(meQuery.CaretX) +' Line: '+ inttostr(meQuery.CaretY);
   // Execute query by pressing Ctrl + Enter
   if (ssCtrl in shift) and (key = VK_RETURN) then
   begin

@@ -1,7 +1,7 @@
 object fmQueryWindow: TfmQueryWindow
-  Left = 258
+  Left = 1079
   Height = 601
-  Top = 106
+  Top = 247
   Width = 720
   ActiveControl = Panel1
   Caption = 'fmQueryWindow'
@@ -17,7 +17,7 @@ object fmQueryWindow: TfmQueryWindow
   OnShow = FormShow
   PopupMenu = pmTab
   Position = poScreenCenter
-  LCLVersion = '1.4.0.3'
+  LCLVersion = '2.0.12.0'
   object Panel1: TPanel
     Left = 0
     Height = 64
@@ -113,20 +113,18 @@ object fmQueryWindow: TfmQueryWindow
         Left = 326
         Height = 40
         Top = 2
-        Width = 10
         Caption = 'ToolButton2'
         Style = tbsSeparator
       end
       object ToolButton3: TToolButton
-        Left = 376
+        Left = 374
         Height = 40
         Top = 2
-        Width = 10
         Caption = 'ToolButton3'
         Style = tbsSeparator
       end
       object tbHistory: TToolButton
-        Left = 336
+        Left = 334
         Hint = 'SQL History'
         Top = 2
         AutoSize = True
@@ -140,12 +138,11 @@ object fmQueryWindow: TfmQueryWindow
         Left = 201
         Height = 40
         Top = 2
-        Width = 5
         Caption = 'ToolButton5'
         Style = tbsDivider
       end
       object tbMenu: TToolButton
-        Left = 386
+        Left = 382
         Hint = 'Menu'
         Top = 2
         AutoSize = True
@@ -178,18 +175,17 @@ object fmQueryWindow: TfmQueryWindow
         ShowHint = True
       end
       object ToolButton1: TToolButton
-        Left = 426
+        Left = 422
         Height = 40
         Top = 2
-        Width = 10
         Caption = 'ToolButton1'
         Style = tbsSeparator
       end
       object cxAutoCommit: TCheckBox
-        Left = 436
-        Height = 24
+        Left = 430
+        Height = 21
         Top = 2
-        Width = 116
+        Width = 109
         Caption = 'Auto Commit'
         Checked = True
         State = cbChecked
@@ -263,12 +259,24 @@ object fmQueryWindow: TfmQueryWindow
     TabOrder = 3
     object pgOutputPageCtl: TPageControl
       Left = 0
-      Height = 263
+      Height = 243
       Top = 0
       Width = 720
       Align = alClient
       Images = imTabs
       TabOrder = 0
+    end
+    object sbMeQuery: TStatusBar
+      Left = 0
+      Height = 20
+      Top = 243
+      Width = 720
+      Panels = <      
+        item
+          Width = 50
+        end>
+      SimpleText = '123'
+      SimplePanel = False
     end
   end
   inline meQuery: TSynEdit
@@ -286,6 +294,7 @@ object fmQueryWindow: TfmQueryWindow
     ParentFont = False
     PopupMenu = pmMemo
     TabOrder = 0
+    OnClick = meQueryClick
     OnKeyDown = meQueryKeyDown
     Gutter.Color = 16183798
     Gutter.Width = 61
@@ -902,17 +911,15 @@ object fmQueryWindow: TfmQueryWindow
     end
   end
   object OpenDialog1: TOpenDialog
-    Width = 907
-    Height = 640
     DefaultExt = '.sql'
     Filter = 'SQL Files|*.sql|All Files|*.*'
-    left = 222
-    top = 134
+    Left = 222
+    Top = 134
   end
   object SaveDialog1: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 222
-    top = 208
+    Left = 222
+    Top = 208
   end
   object SynSQLSyn1: TSynSQLSyn
     DefaultFilter = 'SQL Files (*.sql)|*.sql'
@@ -925,12 +932,12 @@ object fmQueryWindow: TfmQueryWindow
     TableNameAttri.Foreground = clNavy
     TableNameAttri.Style = [fsBold]
     SQLDialect = sqlSybase
-    left = 368
-    top = 112
+    Left = 368
+    Top = 112
   end
   object pmMemo: TPopupMenu
-    left = 105
-    top = 173
+    Left = 105
+    Top = 173
     object lmUndo: TMenuItem
       Caption = 'Undo'
       OnClick = lmUndoClick
@@ -976,12 +983,12 @@ object fmQueryWindow: TfmQueryWindow
   end
   object FindDialog1: TFindDialog
     OnFind = FindDialog1Find
-    left = 285
-    top = 77
+    Left = 285
+    Top = 77
   end
   object pmTab: TPopupMenu
-    left = 410
-    top = 238
+    Left = 410
+    Top = 238
     object lmExport: TMenuItem
       Caption = 'Export Result as'
       object lmCommaDelimited: TMenuItem
@@ -1022,8 +1029,8 @@ object fmQueryWindow: TfmQueryWindow
     end
   end
   object MainMenu1: TMainMenu
-    left = 123
-    top = 76
+    Left = 123
+    Top = 76
     object MenuItem3: TMenuItem
       Caption = 'Run'
       ShortCut = 116
@@ -1032,8 +1039,8 @@ object fmQueryWindow: TfmQueryWindow
     end
   end
   object imTabs: TImageList
-    left = 212
-    top = 500
+    Left = 212
+    Top = 500
     Bitmap = {
       4C69070000001000000010000000F0F7FFFFFDFFFF00FFFFF2FFFFFFF2FFFFFF
       F9FFFBF4F1FFFFFFFCFFFFFFFCFFFFFFFCFFFFFFFCFFFFFFFCFFFFFBF4FFFFFF
@@ -1265,8 +1272,8 @@ object fmQueryWindow: TfmQueryWindow
   object imTools: TImageList
     Height = 32
     Width = 32
-    left = 518
-    top = 126
+    Left = 518
+    Top = 126
     Bitmap = {
       4C690B0000002000000020000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -2680,8 +2687,8 @@ object fmQueryWindow: TfmQueryWindow
     }
   end
   object pmGrid: TPopupMenu
-    left = 448
-    top = 402
+    Left = 448
+    Top = 402
     object lmCopyCell: TMenuItem
       Caption = 'Copy field'
       OnClick = lmCopyCellClick
@@ -2705,19 +2712,21 @@ object fmQueryWindow: TfmQueryWindow
     SelectedColor = clHighlight
     CaseSensitive = False
     Width = 262
+    AutoUseSingleIdent = True
     ShortCut = 16416
     EndOfTokenChr = '()[].'
     OnCodeCompletion = SynCompletion1CodeCompletion
     ExecCommandID = ecSynCompletionExecute
     Editor = meQuery
-    left = 455
-    top = 166
+    ToggleReplaceWhole = False
+    Left = 455
+    Top = 166
   end
   object toolbarImages: TImageList
     Height = 32
     Width = 32
-    left = 629
-    top = 127
+    Left = 629
+    Top = 127
     Bitmap = {
       4C690A0000002000000020000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -4005,7 +4014,7 @@ object fmQueryWindow: TfmQueryWindow
   object FontDialog1: TFontDialog
     MinFontSize = 0
     MaxFontSize = 0
-    left = 96
-    top = 240
+    Left = 96
+    Top = 240
   end
 end
