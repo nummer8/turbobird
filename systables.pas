@@ -176,10 +176,11 @@ function TdmSysTables.GetDBObjectNames(DatabaseIndex: integer;
   ObjectType: TObjectType;
   var Count: Integer): string;
 begin
+  Result :='';
   Init(DatabaseIndex);
   sqQuery.Close;
   if ObjectType = otTables then // Tables
-    sqQuery.SQL.Text:= 'select rdb$relation_name from rdb$relations where rdb$view_blr is null ' +
+    sqQuery.SQL.Text:= 'select rdb$relation_name from rdb$relations where rdb$view_blr is null ' +     //rdb$Relation_type = 0
       ' and (rdb$system_flag is null or rdb$system_flag = 0) order by rdb$relation_name'
   else
   if ObjectType = otGenerators then // Generators

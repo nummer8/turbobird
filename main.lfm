@@ -1,9 +1,9 @@
 object fmMain: TfmMain
-  Left = 320
+  Left = 364
   Height = 631
-  Top = 113
+  Top = 361
   Width = 1152
-  ActiveControl = tvMain
+  ActiveControl = PageControl1
   Caption = 'TurboBird Admin for FireBird'
   ClientHeight = 610
   ClientWidth = 1152

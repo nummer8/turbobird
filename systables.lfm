@@ -8,7 +8,7 @@ object dmSysTables: TdmSysTables
     FieldDefs = <>
     AutoCalcFields = False
     Params = <>
-    left = 216
-    top = 32
+    Left = 216
+    Top = 32
   end
 end
