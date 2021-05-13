@@ -18,7 +18,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="2"/>
-      <BuildNr Value="1109"/>
+      <BuildNr Value="1113"/>
       <StringTable ProductVersion="0.9"/>
     </VersionInfo>
     <BuildModes Count="2">
@@ -80,27 +80,30 @@
         </Mode0>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="6">
+    <RequiredPackages Count="7">
       <Item1>
-        <PackageName Value="laz_synapse"/>
+        <PackageName Value="cryptini"/>
       </Item1>
       <Item2>
-        <PackageName Value="MemDSLaz"/>
+        <PackageName Value="laz_synapse"/>
       </Item2>
       <Item3>
-        <PackageName Value="SQLDBLaz"/>
+        <PackageName Value="MemDSLaz"/>
       </Item3>
       <Item4>
-        <PackageName Value="SynEdit"/>
-        <MinVersion Major="1" Valid="True"/>
+        <PackageName Value="SQLDBLaz"/>
       </Item4>
       <Item5>
-        <PackageName Value="FCL"/>
+        <PackageName Value="SynEdit"/>
         <MinVersion Major="1" Valid="True"/>
       </Item5>
       <Item6>
-        <PackageName Value="LCL"/>
+        <PackageName Value="FCL"/>
+        <MinVersion Major="1" Valid="True"/>
       </Item6>
+      <Item7>
+        <PackageName Value="LCL"/>
+      </Item7>
     </RequiredPackages>
     <Units Count="45">
       <Unit0>
@@ -120,6 +123,7 @@
         <ComponentName Value="fmCreateDB"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="CreateDb"/>
       </Unit2>
       <Unit3>
         <Filename Value="reg.pas"/>
@@ -127,6 +131,7 @@
         <ComponentName Value="fmReg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Reg"/>
       </Unit3>
       <Unit4>
         <Filename Value="querywindow.pas"/>
@@ -142,6 +147,7 @@
         <ComponentName Value="fmViewView"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ViewView"/>
       </Unit5>
       <Unit6>
         <Filename Value="viewtrigger.pas"/>
@@ -149,6 +155,7 @@
         <ComponentName Value="fmViewTrigger"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ViewTrigger"/>
       </Unit6>
       <Unit7>
         <Filename Value="viewsproc.pas"/>
@@ -156,6 +163,7 @@
         <ComponentName Value="fmViewSProc"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ViewSProc"/>
       </Unit7>
       <Unit8>
         <Filename Value="viewgen.pas"/>
@@ -177,6 +185,7 @@
         <ComponentName Value="fmNewGen"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="NewGen"/>
       </Unit10>
       <Unit11>
         <Filename Value="enterpass.pas"/>
@@ -219,6 +228,7 @@
         <ComponentName Value="fmEditDataFullRec"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="EditDataFullRec"/>
       </Unit16>
       <Unit17>
         <Filename Value="udfinfo.pas"/>
@@ -329,6 +339,7 @@
         <ComponentName Value="fmCopyTable"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="CopyTable"/>
       </Unit32>
       <Unit33>
         <Filename Value="dbinfo.pas"/>

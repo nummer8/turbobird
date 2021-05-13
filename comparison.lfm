@@ -117,7 +117,8 @@ object fmComparison: TfmComparison
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Around = 5
     Font.CharSet = 4
-    Font.Name = 'Courier 10 Pitch'
+    Font.Height = -16
+    Font.Name = 'Ubuntu Mono'
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssAutoBoth

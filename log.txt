@@ -1,0 +1,17 @@
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refWARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during pWARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid
+WARNING: TGtk2WidgetSet.InvalidateRect refused invalidating during paint message: TStringGrid

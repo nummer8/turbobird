@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, IBConnection, FileUtil, LResources, Forms, Controls,
-  Graphics, Dialogs, StdCtrls, Buttons, ExtCtrls;
+  Graphics, Dialogs, StdCtrls, Buttons, ExtCtrls, uCryptIni;
 
 type
 
@@ -113,8 +113,24 @@ var
   F: file of TRegisteredDatabase;
   EmptyIndex: Integer;
   FileName: string;
+  Crypt:TCryptIniFile;
 begin
   try
+    Crypt := TCryptIniFile.Create(fmMain.getConfigurationDirectory + 'turbobirdcrypt.reg');
+    Crypt.WriteString(Title,'Title',Title);
+    Crypt.WriteString(Title,'DatabaseName',DatabaseName);
+    Crypt.WriteString(Title,'UserName',UserName);
+    if SavePassword then
+      Crypt.WriteString(Title,'Password',Password)
+    else
+      Crypt.WriteString(Title,'Password','');
+    Crypt.WriteString(Title,'CharSet',CharSet);
+    Crypt.WriteString(Title,'Role',Role);
+    Crypt.WriteBool(Title,'SavePassword',SavePassword);
+    Crypt.WriteBool(Title,'Deleted',False);
+    Crypt.WriteDateTime(Title,'LastOpened', Now);
+    Crypt.Free;
+
     FileName:= fmMain.getConfigurationDirectory + 'turbobird.reg';
 
     AssignFile(F, FileName);
@@ -163,8 +179,24 @@ var
   Rec: TRegisteredDatabase;
   F: file of TRegisteredDatabase;
   FileName: string;
+  Crypt:TCryptIniFile;
 begin
   try
+    Crypt := TCryptIniFile.Create(fmMain.getConfigurationDirectory + 'turbobirdcrypt.reg');
+    Crypt.WriteString(Title,'Title',Title);
+    Crypt.WriteString(Title,'DatabaseName',DatabaseName);
+    Crypt.WriteString(Title,'UserName',UserName);
+    if SavePassword then
+      Crypt.WriteString(Title,'Password',Password)
+    else
+      Crypt.WriteString(Title,'Password','');
+    Crypt.WriteString(Title,'CharSet',CharSet);
+    Crypt.WriteString(Title,'Role',Role);
+    Crypt.WriteBool(Title,'SavePassword',SavePassword);
+    Crypt.WriteBool(Title,'Deleted',False);
+    Crypt.WriteDateTime(Title,'LastOpened', Now);
+    Crypt.Free;
+
     FileName:= fmMain.getConfigurationDirectory + 'turbobird.reg';
 
     AssignFile(F, FileName);
