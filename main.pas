@@ -13,13 +13,13 @@ uses
   Classes, SysUtils, IBConnection, sqldb, sqldblib, memds, FileUtil, LResources,
   Forms, Controls, Graphics, Dialogs, Menus, ComCtrls, Reg, QueryWindow, Grids,
   ExtCtrls, Buttons, StdCtrls, TableManage, dbugintf, turbocommon, importtable,
-  IniFiles;
+  IniFiles, uCryptIni;
 
 {$i turbocommon.inc}
 
 type
   TDatabaseRec = record
-    Index: Integer;
+    Index: integer;
     RegRec: TRegisteredDatabase;
     OrigRegRec: TRegisteredDatabase;
     IBConnection: TIBConnection;
@@ -29,8 +29,8 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
-      editorFontDialog: TFontDialog;
-      Image1: TImage;
+    editorFontDialog: TFontDialog;
+    Image1: TImage;
     ImageList1: TImageList;
     mnOptions: TMenuItem;
     mnEditorFont: TMenuItem;
@@ -204,24 +204,25 @@ type
     procedure pmDatabasePopup(Sender: TObject);
     procedure tvMainDblClick(Sender: TObject);
     procedure tvMainExpanded(Sender: TObject; Node: TTreeNode);
-    procedure GlobalException(Sender: TObject; E : Exception);
+    procedure GlobalException(Sender: TObject; E: Exception);
   private
     FIBConnection: TIBConnection;
     FSQLTransaction: TSQLTransaction;
     FCurrentHistoryFile: string;
-    FActivated: Boolean;
+    FActivated: boolean;
     function FindCustomForm(ATitle: string; AClass: TClass): TComponent;
     // Show new generator form
-    procedure InitNewGen(DatabaseIndex: Integer);
+    procedure InitNewGen(DatabaseIndex: integer);
     function GetServerNameNode(ServerName: string): TTreeNode;
     // Remove RegisteredDatabases and clean up memory held by its objects
     procedure ReleaseRegisteredDatabases;
     // Set connection for SQLQuery1 to selected registered database
-    procedure SetConnection(Index: Integer);
+    procedure SetConnection(Index: integer);
     procedure SetFocus; override; // solve a bug in Lazarus
   protected
     // This procedure will receive the events that are logged by the connection:
-    procedure GetLogEvent(Sender: TSQLConnection; EventType: TDBEventType; Const Msg : String);
+    procedure GetLogEvent(Sender: TSQLConnection; EventType: TDBEventType;
+      const Msg: string);
   public
     // Array of database connection details as stored in turbobird.reg file
     RegisteredDatabases: array of TDatabaseRec;
@@ -231,51 +232,65 @@ type
     function GetServerName(DBName: string): string;
     function RetrieveInputParamFromSP(Body: string): string;
     // Load registered databases from file and show them in treeview
-    function LoadRegisteredDatabases: Boolean;
+    function LoadRegisteredDatabases: boolean;
     function FindQueryWindow(ATitle: string): TComponent;
-    function DeleteRegistration(Index: Integer): Boolean;
+    function DeleteRegistration(Index: integer): boolean;
     // Returns BLOB subtype clause depending on subtype
     function GetBlobSubTypeName(SubType: integer): string;
     // Get name of index used for primary key
     // Also returns name of constraint used
-    function GetPrimaryKeyIndexName(DatabaseIndex: Integer; ATableName: string; var ConstraintName: string): string;
+    function GetPrimaryKeyIndexName(DatabaseIndex: integer; ATableName: string;
+      var ConstraintName: string): string;
     // Get primary key field(s) names into KeyFields
-    function GetPrimaryKeyFields(DatabaseIndex: Integer; ATableName: string; var KeyFields: TStringList): boolean;
-    function GetConstraintFields(ATableName, AIndexName: string; var List: TStringList): Boolean;
+    function GetPrimaryKeyFields(DatabaseIndex: integer; ATableName: string;
+      var KeyFields: TStringList): boolean;
+    function GetConstraintFields(ATableName, AIndexName: string;
+      var List: TStringList): boolean;
     // Get fields information for specified table
     // Fills SQLQuery1 with details
-    procedure GetFields(DatabaseIndex: Integer; ATableName: string; FieldsList: TStringList);
+    procedure GetFields(DatabaseIndex: integer; ATableName: string;
+      FieldsList: TStringList);
     // Get body of a stored procedure (without SET TERM... clauses)
     // Fills SQLQuery1 with details
-    function GetStoredProcBody(DatabaseIndex: Integer; AProcName: string; var SPOwner: string): string;
+    function GetStoredProcBody(DatabaseIndex: integer; AProcName: string;
+      var SPOwner: string): string;
     // Get body and output parameters of a view
     // Does *not* fill SQLQuery1 with details
-    function GetViewInfo(DatabaseIndex: Integer; AViewName: string; var Columns, Body: string): Boolean;
-    function ChangeTriggerActivity(DatabaseIndex: Integer; ATriggerName: string; ActiveState: Boolean): Boolean;
-    function GetIndices(ATableName: string; AQuery: TSQLQuery): Boolean;
-    function GetIndexFields(ATableName, AIndexName: string; AQuery: TSQLQuery; var FieldsList: TStringList): Boolean;
-    function GetUDFInfo(DatabaseIndex: Integer; UDFName: string; var ModuleName, EntryPoint, Params: string): Boolean;
-    function ShowQueryWindow(DatabaseIndex: Integer; ATitle: string): TfmQueryWindow;
+    function GetViewInfo(DatabaseIndex: integer; AViewName: string;
+      var Columns, Body: string): boolean;
+    function ChangeTriggerActivity(DatabaseIndex: integer; ATriggerName: string;
+      ActiveState: boolean): boolean;
+    function GetIndices(ATableName: string; AQuery: TSQLQuery): boolean;
+    function GetIndexFields(ATableName, AIndexName: string; AQuery: TSQLQuery;
+      var FieldsList: TStringList): boolean;
+    function GetUDFInfo(DatabaseIndex: integer; UDFName: string;
+      var ModuleName, EntryPoint, Params: string): boolean;
+    function ShowQueryWindow(DatabaseIndex: integer; ATitle: string): TfmQueryWindow;
     procedure FillObjectRoot(Node: TTreeNode);
-    procedure FillAndShowConstraintsForm(Form: TfmTableManage; ATableName: string; dbIndex: Integer);
-    procedure ShowCompleteQueryWindow(DatabaseIndex: Integer; ATitle, AQueryText: string;
-      OnCommitProcedure: TNotifyEvent = nil);
+    procedure FillAndShowConstraintsForm(Form: TfmTableManage;
+      ATableName: string; dbIndex: integer);
+    procedure ShowCompleteQueryWindow(DatabaseIndex: integer;
+      ATitle, AQueryText: string; OnCommitProcedure: TNotifyEvent = nil);
     // Gets fields info and fills TableManage form(!) grids with info
-    procedure ViewTableFields(ATableName: string; dbIndex: Integer; AStringGrid: TStringGrid);
-    procedure ShowIndicesManagement(AForm: TForm; DatabaseIndex: Integer; ATableName: string);
-    function GetTableNames(dbIndex: Integer): string;
-    function CreateNewTrigger(dbIndex: Integer; ATableName: string; OnCommitProcedure: TNotifyEvent = nil): Boolean;
-    function AddToSQLHistory(DatabaseTitle: string; SQLType, SQLStatement: string): Boolean;
-    function SaveAndCloseSQLHistory: Boolean;
-    function OpenSQLHistory(DatabaseTitle: string): Boolean;
+    procedure ViewTableFields(ATableName: string; dbIndex: integer;
+      AStringGrid: TStringGrid);
+    procedure ShowIndicesManagement(AForm: TForm; DatabaseIndex: integer;
+      ATableName: string);
+    function GetTableNames(dbIndex: integer): string;
+    function CreateNewTrigger(dbIndex: integer; ATableName: string;
+      OnCommitProcedure: TNotifyEvent = nil): boolean;
+    function AddToSQLHistory(DatabaseTitle: string;
+      SQLType, SQLStatement: string): boolean;
+    function SaveAndCloseSQLHistory: boolean;
+    function OpenSQLHistory(DatabaseTitle: string): boolean;
     // Connects to database.
     // If not succesful (or if ForceConnectDialog is true), ask user for credentials and try again
-    function ConnectToDBAs(dbIndex: Integer; ForceConnectDialog: boolean=false): Boolean;
-    function IsLinux: Boolean;
-    function IsWindows: Boolean;
-    function IsUnix: Boolean;
-    function Is64bit: Boolean;
-    function Is32bit: Boolean;
+    function ConnectToDBAs(dbIndex: integer; ForceConnectDialog: boolean = False): boolean;
+    function IsLinux: boolean;
+    function IsWindows: boolean;
+    function IsUnix: boolean;
+    function Is64bit: boolean;
+    function Is32bit: boolean;
     function getConfigurationDirectory: string;
   end;
 
@@ -290,10 +305,10 @@ implementation
 { TfmMain }
 
 uses CreateDb, ViewView, ViewTrigger, ViewSProc, ViewGen, NewTable, NewGen,
-     EnterPass, CreateTrigger, EditTable, CallProc, EditDataFullRec, UDFInfo, ViewDomain,
-     NewDomain, SysTables, Scriptdb, UserPermissions, BackupRestore, UnitFirebirdServices, CreateUser, ChangePass,
-     PermissionManage, CopyTable, About, NewEditField, dbInfo, Comparison;
-
+  EnterPass, CreateTrigger, EditTable, CallProc, EditDataFullRec, UDFInfo, ViewDomain,
+  NewDomain, SysTables, Scriptdb, UserPermissions, BackupRestore,
+  UnitFirebirdServices, CreateUser, ChangePass,
+  PermissionManage, CopyTable, About, NewEditField, dbInfo, Comparison;
 
 procedure TfmMain.mnExitClick(Sender: TObject);
 begin
@@ -304,12 +319,12 @@ procedure TfmMain.FormCreate(Sender: TObject);
 begin
   {$IFNDEF DEBUG}
   // Do not log to debug server if built as release instead of debug
-  SetDebuggingEnabled(false);
+  SetDebuggingEnabled(False);
   {$ENDIF}
-  Application.OnException:= @GlobalException;
-  FActivated:= False;
+  Application.OnException := @GlobalException;
+  FActivated := False;
   LoadRegisteredDatabases;
-  StatusBar1.Panels[0].Text:= 'TurboBird for ' + Target + '-' + Arch;
+  StatusBar1.Panels[0].Text := 'TurboBird for ' + Target + '-' + Arch;
 end;
 
 procedure TfmMain.FormDestroy(Sender: TObject);
@@ -327,41 +342,45 @@ end;
 procedure TfmMain.lmAddUserClick(Sender: TObject);
 var
   SelNode: TTreeNode;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
   with fmCreateUser do
-  try
-    SelNode:= tvMain.Selected;
-    dbIndex:= PtrInt(SelNode.Parent.Data);
-    Init(dbIndex);
-    edUserName.Clear;
-    edPassword.Clear;
-    if ShowModal = mrOK then
-    begin
-      // Create user
-      dmSysTables.Init(dbIndex);
-      dmSysTables.sqQuery.Close;
-      dmSysTables.sqQuery.SQL.Text:= 'create user ' + edUserName.Text + ' password ' + QuotedStr(edPassword.Text);
-      dmSysTables.sqQuery.ExecSQL;
-
-      // Grant rule
-      if cxGrantRole.Checked then
+    try
+      SelNode := tvMain.Selected;
+      dbIndex := PtrInt(SelNode.Parent.Data);
+      Init(dbIndex);
+      edUserName.Clear;
+      edPassword.Clear;
+      if ShowModal = mrOk then
       begin
-        dmSysTables.sqQuery.SQL.Text:= 'grant ' + cbRoles.Text + ' to ' + edUserName.Text;
+        // Create user
+        dmSysTables.Init(dbIndex);
+        dmSysTables.sqQuery.Close;
+        dmSysTables.sqQuery.SQL.Text :=
+          'create user ' + edUserName.Text + ' password ' + QuotedStr(edPassword.Text);
         dmSysTables.sqQuery.ExecSQL;
+
+        // Grant rule
+        if cxGrantRole.Checked then
+        begin
+          dmSysTables.sqQuery.SQL.Text :=
+            'grant ' + cbRoles.Text + ' to ' + edUserName.Text;
+          dmSysTables.sqQuery.ExecSQL;
+        end;
+        dmSysTables.stTrans.Commit;
+        MessageDlg('New user (' + edUserName.Text + ') has been created successfully',
+          mtInformation, [mbOK], 0);
+        if not cxGrantRole.Checked then
+          ShowMessage('User (' + edUserName.Text +
+            ') will not appear in users list unless you grant it a permission');
+        lmRefresh.Click;
       end;
-      dmSysTables.stTrans.Commit;
-      MessageDlg('New user (' + edUserName.Text + ') has been created successfully', mtInformation, [mbOk], 0);
-      if not cxGrantRole.Checked then
-        ShowMessage('User (' + edUserName.Text + ') will not appear in users list unless you grant it a permission');
-      lmRefresh.Click;
+    except
+      on E: Exception do
+      begin
+        MessageDlg('Error while creating new user: ' + e.Message, mtError, [mbOK], 0);
+      end;
     end;
-  except
-    on E: Exception do
-    begin
-      MessageDlg('Error while creating new user: ' + e.Message, mtError, [mbOk], 0);
-    end;
-  end;
 end;
 
 (***********  Backup / Restore database ************)
@@ -370,10 +389,10 @@ procedure TfmMain.lmBackupClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   with RegisteredDatabases[PtrInt(tvMain.Selected.Data)].RegRec do
     fmBackupRestore.Init(SelNode.Text, DatabaseName, UserName, Password);
-  fmBackupRestore.cbOperation.Enabled:= True;
+  fmBackupRestore.cbOperation.Enabled := True;
   fmBackupRestore.Show;
 end;
 
@@ -381,19 +400,20 @@ end;
 
 procedure TfmMain.lmChangePasswordClick(Sender: TObject);
 begin
-  fmChangePass.Caption:= 'Change password for user: ' + tvMain.Selected.Text;
+  fmChangePass.Caption := 'Change password for user: ' + tvMain.Selected.Text;
   fmChangePass.edPassword.Clear;
   fmChangePass.edConfirm.Clear;
-  if fmChangePass.ShowModal = mrOK then
+  if fmChangePass.ShowModal = mrOk then
   begin
     try
-       dmSysTables.Init(PtrInt(tvMain.Selected.Parent.Parent.Data));
-       dmSysTables.sqQuery.Close;
-       dmSysTables.sqQuery.SQL.Text:= 'alter user ' + tvMain.Selected.Text +
-         ' password ' + QuotedStr(fmChangePass.edPassword.Text);
-       dmSysTables.sqQuery.ExecSQL;
-       dmSysTables.stTrans.Commit;
-       MessageDlg('Password has been changed', mtInformation, [mbOk], 0);
+      dmSysTables.Init(PtrInt(tvMain.Selected.Parent.Parent.Data));
+      dmSysTables.sqQuery.Close;
+      dmSysTables.sqQuery.SQL.Text :=
+        'alter user ' + tvMain.Selected.Text + ' password ' +
+        QuotedStr(fmChangePass.edPassword.Text);
+      dmSysTables.sqQuery.ExecSQL;
+      dmSysTables.stTrans.Commit;
+      MessageDlg('Password has been changed', mtInformation, [mbOK], 0);
     except
       on E: Exception do
         ShowMessage('Error while changing password: ' + e.Message);
@@ -403,37 +423,36 @@ end;
 
 procedure TfmMain.lmCompareClick(Sender: TObject);
 var
-  dbIndex: Integer;
+  dbIndex: integer;
   Title: string;
   ATab: TTabSheet;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Data);
+  dbIndex := PtrInt(tvMain.Selected.Data);
 
   // Check if password is saved - it may be empty, which can be valid for
   // e.g. embedded databases
-  if (RegisteredDatabases[dbIndex].RegRec.SavePassword) or
-    ConnectToDBAs(dbIndex) then
+  if (RegisteredDatabases[dbIndex].RegRec.SavePassword) or ConnectToDBAs(dbIndex) then
   begin
-    Title:= RegisteredDatabases[dbIndex].RegRec.Title + ': Database Comparison';
-    fmComparison:= FindCustomForm(Title, TfmComparison) as TfmComparison;
+    Title := RegisteredDatabases[dbIndex].RegRec.Title + ': Database Comparison';
+    fmComparison := FindCustomForm(Title, TfmComparison) as TfmComparison;
     if fmComparison = nil then
     begin
-      fmComparison:= TfmComparison.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      fmComparison.Parent:= ATab;
-      fmComparison.Left:= 0;
-      fmComparison.Top:= 0;
-      fmComparison.BorderStyle:= bsNone;
-      fmComparison.Align:= alClient;
-      fmComparison.Caption:= Title;
+      fmComparison := TfmComparison.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      fmComparison.Parent := ATab;
+      fmComparison.Left := 0;
+      fmComparison.Top := 0;
+      fmComparison.BorderStyle := bsNone;
+      fmComparison.Align := alClient;
+      fmComparison.Caption := Title;
     end
     else
-      ATab:= fmComparison.Parent as TTabSheet;
+      ATab := fmComparison.Parent as TTabSheet;
 
-    PageControl1.ActivePage:= ATab;
-    ATab.Tag:= dbIndex;
-    ATab.Caption:= Title;
+    PageControl1.ActivePage := ATab;
+    ATab.Tag := dbIndex;
+    ATab.Caption := Title;
     fmComparison.Init(dbIndex);
     fmComparison.Show;
   end;
@@ -447,18 +466,20 @@ end;
 procedure TfmMain.lmCopyUserPermissionClick(Sender: TObject);
 var
   List: TStringList;
-  dbIndex: Integer;
+  dbIndex: integer;
   UserName: string;
   NewUser: string;
 begin
-  if InputQuery('Permission', 'Please type a User/Role name to copy perissions to', NewUser) then
+  if InputQuery('Permission', 'Please type a User/Role name to copy perissions to',
+    NewUser) then
   begin
-    UserName:= tvMain.Selected.Text;
-    dbIndex:= PtrInt(tvMain.Selected.Parent.Parent.Data);
-    List:= TStringList.Create;
+    UserName := tvMain.Selected.Text;
+    dbIndex := PtrInt(tvMain.Selected.Parent.Parent.Data);
+    List := TStringList.Create;
     try
       Scriptdb.ScriptUserAllPermissions(dbIndex, UserName, List, NewUser);
-      ShowCompleteQueryWindow(dbIndex, 'Script permissions for : ' + UserName, List.Text);
+      ShowCompleteQueryWindow(dbIndex, 'Script permissions for : ' +
+        UserName, List.Text);
     finally
       List.Free;
     end;
@@ -473,7 +494,7 @@ end;
 
 procedure TfmMain.lmCreateDBClick(Sender: TObject);
 begin
-  fmCreateDB.edNewDatabase.Text:= tvMain.Selected.Text + ':';
+  fmCreateDB.edNewDatabase.Text := tvMain.Selected.Text + ':';
   mnCreateDBClick(nil);
 end;
 
@@ -481,55 +502,55 @@ procedure TfmMain.lmDBInfoClick(Sender: TObject);
 var
   ATab: TTabSheet;
   Title: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  Title:= 'Database information for: ' + tvMain.Selected.Text;
-  dbIndex:= PtrInt(tvMain.Selected.Data);
+  Title := 'Database information for: ' + tvMain.Selected.Text;
+  dbIndex := PtrInt(tvMain.Selected.Data);
 
-  fmDBInfo:= FindCustomForm(Title, TfmDBInfo) as TfmDBInfo;
+  fmDBInfo := FindCustomForm(Title, TfmDBInfo) as TfmDBInfo;
 
   if fmDBInfo = nil then
   begin
-    fmDBInfo:= TfmDBInfo.Create(Application);
-    ATab:= TTabSheet.Create(self);
-    ATab.Parent:= PageControl1;
-    fmDBInfo.Parent:= ATab;
-    fmDBInfo.Left:= 0;
-    fmDBInfo.Top:= 0;
-    fmDBInfo.BorderStyle:= bsNone;
-    fmDBInfo.Align:= alClient;
-    Caption:= Title;
+    fmDBInfo := TfmDBInfo.Create(Application);
+    ATab := TTabSheet.Create(self);
+    ATab.Parent := PageControl1;
+    fmDBInfo.Parent := ATab;
+    fmDBInfo.Left := 0;
+    fmDBInfo.Top := 0;
+    fmDBInfo.BorderStyle := bsNone;
+    fmDBInfo.Align := alClient;
+    Caption := Title;
   end
   else
-    ATab:= fmDBInfo.Parent as TTabSheet;
+    ATab := fmDBInfo.Parent as TTabSheet;
 
-  PageControl1.ActivePage:= ATab;
-  ATab.Tag:= dbIndex;
-  ATab.Caption:= Title;
+  PageControl1.ActivePage := ATab;
+  ATab.Tag := dbIndex;
+  ATab.Caption := Title;
 
   fmDBInfo.Init(dbIndex);
 end;
 
 procedure TfmMain.lmDisconnectClick(Sender: TObject);
 var
-  dbIndex: Integer;
-  i: Integer;
-  j: Integer;
+  dbIndex: integer;
+  i: integer;
+  j: integer;
   TabSheet: TTabSheet;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Data);
+  dbIndex := PtrInt(tvMain.Selected.Data);
   RegisteredDatabases[dbIndex].IBConnection.Close;
-  for i:= PageControl1.PageCount - 1 downto 0 do
+  for i := PageControl1.PageCount - 1 downto 0 do
     if (PageControl1.Pages[i] as TComponent).Tag = dbIndex then
     begin
-      TabSheet:= PageControl1.Page[i] as TTabSheet;
-      for j:= 0 to TabSheet.ControlCount - 1 do
-      if TabSheet.Controls[j] is TForm then
-      begin
-        (TabSheet.Controls[j] as TForm).Close;
-        TabSheet.Free;
-        Break;
-      end;
+      TabSheet := PageControl1.Page[i] as TTabSheet;
+      for j := 0 to TabSheet.ControlCount - 1 do
+        if TabSheet.Controls[j] is TForm then
+        begin
+          (TabSheet.Controls[j] as TForm).Close;
+          TabSheet.Free;
+          Break;
+        end;
     end;
   tvMain.Selected.Collapse(True);
 end;
@@ -537,21 +558,21 @@ end;
 procedure TfmMain.lmEditFieldClick(Sender: TObject);
 var
   SelNode: TTreeNode;
-  dbIndex: Integer;
+  dbIndex: integer;
   FieldName: string;
   FieldType, DefaultValue: string;
-  Size, Scale: Integer;
+  Size, Scale: integer;
   Description, Characterset, Collation: string;
-  NotNull: Boolean;
+  NotNull: boolean;
 begin
-  SelNode:= tvMain.Selected;
-  dbIndex:= PtrInt(SelNode.Parent.Parent.Parent.Data);
-  FieldName:= Copy(SelNode.Text, 1, Pos(' ', SelNode.Text) - 1);
+  SelNode := tvMain.Selected;
+  dbIndex := PtrInt(SelNode.Parent.Parent.Parent.Data);
+  FieldName := Copy(SelNode.Text, 1, Pos(' ', SelNode.Text) - 1);
   if dmSysTables.GetFieldInfo(dbIndex, SelNode.Parent.Text, FieldName,
-    FieldType, Size, Scale, NotNull,
-    DefaultValue, Characterset, Collation, Description) then
+    FieldType, Size, Scale, NotNull, DefaultValue, Characterset,
+    Collation, Description) then
   begin
-    fmNewEditField:= TfmNewEditField.Create(nil);
+    fmNewEditField := TfmNewEditField.Create(nil);
     fmNewEditField.Init(dbIndex, SelNode.Parent.Text, foEdit,
       FieldName, FieldType,
       CharacterSet, Collation,
@@ -569,14 +590,14 @@ procedure TfmMain.lmGetIncrementGenClick(Sender: TObject);
 var
   SelNode: TTreeNode;
   AGenName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
 
-    AGenName:= SelNode.Text;
+    AGenName := SelNode.Text;
 
     ShowCompleteQueryWindow(dbIndex, 'get increment generator SQL for:' + AGenName,
       'select GEN_ID(' + AGenName + ', 1) from RDB$Database;');
@@ -587,11 +608,11 @@ procedure TfmMain.lmImportTableClick(Sender: TObject);
 var
   MyImportTable: TfmImportTable;
 begin
-  MyImportTable:=TfmImportTable.Create(nil);
+  MyImportTable := TfmImportTable.Create(nil);
   try
-	  // Pass db index and table name
-	  MyImportTable.Init(PtrInt(tvMain.Selected.Parent.Parent.Data),
-		  tvMain.Selected.Text);
+    // Pass db index and table name
+    MyImportTable.Init(PtrInt(tvMain.Selected.Parent.Parent.Data),
+      tvMain.Selected.Text);
     MyImportTable.ShowModal;
   finally
     MyImportTable.Free;
@@ -607,7 +628,7 @@ end;
 
 procedure TfmMain.FormActivate(Sender: TObject);
 begin
-  FActivated:= True;
+  FActivated := True;
 end;
 
 
@@ -618,11 +639,11 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), SelNode.Text);
-    QWindow.meQuery.Lines.Text:= 'select * from ' + SelNode.Text;
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), SelNode.Text);
+    QWindow.meQuery.Lines.Text := 'select * from ' + SelNode.Text;
     QWindow.bbRunClick(nil);
     QWindow.Show;
   end;
@@ -632,9 +653,9 @@ procedure TfmMain.lmActivateTrigClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if ChangeTriggerActivity(PtrInt(SelNode.Parent.Parent.Data), SelNode.Text, True) then
-    MessageDlg('Trigger has been activated', mtInformation, [mbOk], 0);
+    MessageDlg('Trigger has been activated', mtInformation, [mbOK], 0);
 end;
 
 
@@ -648,69 +669,71 @@ var
   SPOwner: string;
   Params: string;
   OneParam: string;
-  i: Integer;
+  i: integer;
   QWindow: TfmQueryWindow;
   Line: string;
-  Called: Boolean;
-  WithParams: Boolean;
+  Called: boolean;
+  WithParams: boolean;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
 
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    AProcName:= SelNode.Text;
-    Body:= GetStoredProcBody(PtrInt(SelNode.Parent.Parent.Data), AProcName, SPOwner);
-    Params:= RetrieveInputParamFromSP(Body);
-    withParams:= Params <> '';
+    AProcName := SelNode.Text;
+    Body := GetStoredProcBody(PtrInt(SelNode.Parent.Parent.Data), AProcName, SPOwner);
+    Params := RetrieveInputParamFromSP(Body);
+    withParams := Params <> '';
     with fmCallProc do
     begin
-      StringGrid1.RowCount:= 1;
+      StringGrid1.RowCount := 1;
       if WithParams then
-        Params:= Params + ',';
-      i:= 1;
+        Params := Params + ',';
+      i := 1;
       if WithParams then
-      while Params <> '' do
-      begin
-        OneParam:= Copy(Params, 1, Pos(',', Params) - 1);
-        Delete(Params, 1, Pos(',', Params));
-        Params:= Trim(Params);
+        while Params <> '' do
+        begin
+          OneParam := Copy(Params, 1, Pos(',', Params) - 1);
+          Delete(Params, 1, Pos(',', Params));
+          Params := Trim(Params);
 
-        StringGrid1.RowCount:= i + 1;
+          StringGrid1.RowCount := i + 1;
 
-        StringGrid1.Cells[1, i]:= Trim(Copy(OneParam, 1, Pos(' ', OneParam)));
-        StringGrid1.Cells[2, i]:= Trim(Copy(OneParam, Pos(' ', OneParam), Length(OneParam)));
+          StringGrid1.Cells[1, i] := Trim(Copy(OneParam, 1, Pos(' ', OneParam)));
+          StringGrid1.Cells[2, i] :=
+            Trim(Copy(OneParam, Pos(' ', OneParam), Length(OneParam)));
 
-        Inc(i);
-      end;
+          Inc(i);
+        end;
 
-      Caption:= 'Call stored procedure: ' + AProcName;
+      Caption := 'Call stored procedure: ' + AProcName;
 
       if WithParams then
-        Called:= ShowModal = mrOK;  // View parameters form
+        Called := ShowModal = mrOk;  // View parameters form
 
       if (Called) or (not WithParams) then
       begin
-        QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Call procedure: ' + AProcName);
-        QWindow.meQuery.lines.Clear;
+        QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+          'Call procedure: ' + AProcName);
+        QWindow.meQuery.Lines.Clear;
         if Pos('suspend', LowerCase(Body)) > 0 then
-          Line:= 'select * from ' + AProcName
+          Line := 'select * from ' + AProcName
         else
-          Line:= 'execute procedure ' + AProcName;
+          Line := 'execute procedure ' + AProcName;
 
         if WithParams then
-          Line:= Line + '(';
+          Line := Line + '(';
 
-        for i:= 1 to StringGrid1.RowCount - 1 do
+        for i := 1 to StringGrid1.RowCount - 1 do
           if Pos('CHAR', StringGrid1.Cells[2, i]) > 0 then
-            Line:= Line + QuotedStr(StringGrid1.Cells[0, i]) + ', '
+            Line := Line + QuotedStr(StringGrid1.Cells[0, i]) + ', '
           else
-            Line:= Line + StringGrid1.Cells[0, i] + ', ';
+            Line := Line + StringGrid1.Cells[0, i] + ', ';
         if WithParams then
         begin
           Delete(Line, Length(Line) - 1, 2);
-          Line:= Line + ')';
+          Line := Line + ')';
         end;
-        Line:= Line + ';';
+        Line := Line + ';';
         QWindow.meQuery.Lines.Add(Line);
         QWindow.Show;
 
@@ -729,66 +752,67 @@ begin
     tvMain.Selected.Collapse(False);
 end;
 
-function TfmMain.ConnectToDBAs(dbIndex: Integer; ForceConnectDialog: boolean=false): Boolean;
+function TfmMain.ConnectToDBAs(dbIndex: integer;
+  ForceConnectDialog: boolean = False): boolean;
 var
   Rec: TRegisteredDatabase;
-  Count: Integer;
+  Count: integer;
 begin
-  Result:= False;
-  Rec:= RegisteredDatabases[dbIndex].RegRec;
-  fmEnterPass.laDatabase.Caption:= Rec.Title;
-  fmEnterPass.edUser.Text:= Rec.UserName;
+  Result := False;
+  Rec := RegisteredDatabases[dbIndex].RegRec;
+  fmEnterPass.laDatabase.Caption := Rec.Title;
+  fmEnterPass.edUser.Text := Rec.UserName;
   fmEnterPass.edPassword.Clear;
   fmEnterPass.cbRole.Clear;
   // Use may have saved an empty password, which is valid for embedded dbs
   // So check SavePassword instead of Password itself.
-  if (ForceConnectDialog=false) and Rec.SavePassword then
-  try
-    fmEnterPass.cbRole.Items.CommaText:= dmSysTables.GetDBObjectNames(dbIndex, otRoles, Count);
-    fmEnterPass.cbRole.ItemIndex:= -1;
-    fmEnterPass.cbRole.Text:= '';
-    Result:= True; //this works, no need to go through a retry attempt below
-  except
-    // We don't particularly care which error occurred; we're trying again below.
-    Result:= False;
-  end;
+  if (ForceConnectDialog = False) and Rec.SavePassword then
+    try
+      fmEnterPass.cbRole.Items.CommaText :=
+        dmSysTables.GetDBObjectNames(dbIndex, otRoles, Count);
+      fmEnterPass.cbRole.ItemIndex := -1;
+      fmEnterPass.cbRole.Text := '';
+      Result := True; //this works, no need to go through a retry attempt below
+    except
+      // We don't particularly care which error occurred; we're trying again below.
+      Result := False;
+    end;
   // Only show form if connection failed before
-  if (ForceConnectDialog or (Result=false)) and
-    (fmEnterPass.ShowModal = mrOk) then
+  if (ForceConnectDialog or (Result = False)) and (fmEnterPass.ShowModal = mrOk) then
   begin
-    if fmReg.TestConnection(Rec.DatabaseName, fmEnterPass.edUser.Text, fmEnterPass.edPassword.Text,
-      Rec.Charset) then
+    if fmReg.TestConnection(Rec.DatabaseName, fmEnterPass.edUser.Text,
+      fmEnterPass.edPassword.Text, Rec.Charset) then
     begin
-      RegisteredDatabases[dbIndex].RegRec.UserName:= fmEnterPass.edUser.Text;
-      RegisteredDatabases[dbIndex].RegRec.Password:= fmEnterPass.edPassword.Text;
-      RegisteredDatabases[dbIndex].RegRec.Role:= fmEnterPass.cbRole.Text;
-      Result:= True;
+      RegisteredDatabases[dbIndex].RegRec.UserName := fmEnterPass.edUser.Text;
+      RegisteredDatabases[dbIndex].RegRec.Password := fmEnterPass.edPassword.Text;
+      RegisteredDatabases[dbIndex].RegRec.Role := fmEnterPass.cbRole.Text;
+      Result := True;
     end;
   end;
 end;
 
-function TfmMain.IsLinux: Boolean;
+function TfmMain.IsLinux: boolean;
 begin
   Result := Target = 'Linux';
 end;
 
-function TfmMain.IsWindows: Boolean;
+function TfmMain.IsWindows: boolean;
 begin
   Result := Target = 'Win';
 end;
 
-function TfmMain.IsUnix: Boolean;
+function TfmMain.IsUnix: boolean;
 begin
 end;
 
-function TfmMain.Is64bit: Boolean;
+function TfmMain.Is64bit: boolean;
 begin
-  result := Arch = '64';
+  Result := Arch = '64';
 end;
 
-function TfmMain.Is32bit: Boolean;
+function TfmMain.Is32bit: boolean;
 begin
-  result := Arch = '32';
+  Result := Arch = '32';
 end;
 
 function TfmMain.getConfigurationDirectory: string;
@@ -797,11 +821,12 @@ var
 begin
   if IsLinux then
   begin
-    ConfigDir:= GetEnvironmentVariable('HOME') + DirectorySeparator + '.turbobird' + DirectorySeparator;
+    ConfigDir := GetEnvironmentVariable('HOME') + DirectorySeparator +
+      '.turbobird' + DirectorySeparator;
 
     if not DirectoryExists(ConfigDir) then
       CreateDir(ConfigDir);
-    Result:= ConfigDir;
+    Result := ConfigDir;
   end
   else
     ExtractFilePath(ParamStr(0));
@@ -809,7 +834,8 @@ end;
 
 (****************  Fill and show constraints form ************************)
 
-procedure TfmMain.FillAndShowConstraintsForm(Form: TfmTableManage; ATableName: string; dbIndex: Integer);
+procedure TfmMain.FillAndShowConstraintsForm(Form: TfmTableManage;
+  ATableName: string; dbIndex: integer);
 begin
   dmSysTables.Init(dbIndex);
   dmSysTables.GetTableConstraints(ATableName, Form.SQLQuery1);
@@ -818,22 +844,22 @@ end;
 
 (***********  Show and Fill Query Window *****************)
 
-procedure TfmMain.ShowCompleteQueryWindow(DatabaseIndex: Integer; ATitle,
-  AQueryText: string; OnCommitProcedure: TNotifyEvent = nil);
+procedure TfmMain.ShowCompleteQueryWindow(DatabaseIndex: integer;
+  ATitle, AQueryText: string; OnCommitProcedure: TNotifyEvent = nil);
 var
   QWindow: TfmQueryWindow;
   Part: string;
 begin
-  QWindow:= ShowQueryWindow(DatabaseIndex, ATitle);
+  QWindow := ShowQueryWindow(DatabaseIndex, ATitle);
   QWindow.meQuery.ClearAll;
-  QWindow.OnCommit:= OnCommitProcedure;
+  QWindow.OnCommit := OnCommitProcedure;
   repeat
     if Pos(LineEnding, AQueryText) > 0 then
-      Part:= Copy(AQueryText, 1, Pos(LineEnding, AQueryText))
+      Part := Copy(AQueryText, 1, Pos(LineEnding, AQueryText))
     else
-      Part:= AQueryText;
+      Part := AQueryText;
     Delete(AQueryText, 1, Length(Part));
-    Part:= StringReplace(Part, LineEnding, ' ', [rfReplaceAll]);
+    Part := StringReplace(Part, LineEnding, ' ', [rfReplaceAll]);
 
     QWindow.meQuery.Lines.Add(Part);
   until AQueryText = '';
@@ -848,13 +874,13 @@ procedure TfmMain.lmCreateAutoIncClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
     InitNewGen(PtrInt(SelNode.Parent.Parent.Data));
-    fmNewGen.edGenName.Text:= SelNode.Text;
-    fmNewGen.edGenName.Enabled:= False;
-    fmNewGen.cxTrigger.Checked:= True;
+    fmNewGen.edGenName.Text := SelNode.Text;
+    fmNewGen.edGenName.Enabled := False;
+    fmNewGen.cxTrigger.Checked := True;
     fmNewGen.ShowModal;
   end;
 end;
@@ -867,69 +893,75 @@ var
   QWindow: TfmQueryWindow;
   AProcName: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
-  if InputQuery('Create new stored procedure', 'Please enter new procedure name', AProcName) then
-  begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new stored procedure');
-    QWindow.meQuery.Lines.Clear;
- //   QWindow.meQuery.Lines.Add('SET TERM ^;');
-    QWindow.meQuery.Lines.Add('CREATE PROCEDURE ' + AProcName);
-    QWindow.meQuery.Lines.Add('-- Input parameters, you can modify,remove them');
+    if InputQuery('Create new stored procedure', 'Please enter new procedure name',
+      AProcName) then
+    begin
+      QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data),
+        'Create new stored procedure');
+      QWindow.meQuery.Lines.Clear;
+      //   QWindow.meQuery.Lines.Add('SET TERM ^;');
+      QWindow.meQuery.Lines.Add('CREATE PROCEDURE ' + AProcName);
+      QWindow.meQuery.Lines.Add('-- Input parameters, you can modify,remove them');
 
-    QWindow.meQuery.Lines.Add('( Input1 int, -- You can replace it by your first parameter');
-    QWindow.meQuery.Lines.Add(' Input2 varchar(20) -- you can replace it by your second parameter');
-    QWindow.meQuery.Lines.Add(')');
-    QWindow.meQuery.Lines.Add('RETURNS');
-    QWindow.meQuery.Lines.Add('( Out1 int -- You can replace it by your first parameter');
-    QWindow.meQuery.Lines.Add(')');
-    QWindow.meQuery.Lines.Add('AS');
-    QWindow.meQuery.Lines.Add('BEGIN');
-    QWindow.meQuery.Lines.Add('  -- Write your procedure code here');
-    QWindow.meQuery.Lines.Add('END;');
-   // QWindow.meQuery.Lines.Add('SET TERM ;^');
-    QWindow.Show;
-  end;
+      QWindow.meQuery.Lines.Add(
+        '( Input1 int, -- You can replace it by your first parameter');
+      QWindow.meQuery.Lines.Add(
+        ' Input2 varchar(20) -- you can replace it by your second parameter');
+      QWindow.meQuery.Lines.Add(')');
+      QWindow.meQuery.Lines.Add('RETURNS');
+      QWindow.meQuery.Lines.Add(
+        '( Out1 int -- You can replace it by your first parameter');
+      QWindow.meQuery.Lines.Add(')');
+      QWindow.meQuery.Lines.Add('AS');
+      QWindow.meQuery.Lines.Add('BEGIN');
+      QWindow.meQuery.Lines.Add('  -- Write your procedure code here');
+      QWindow.meQuery.Lines.Add('END;');
+      // QWindow.meQuery.Lines.Add('SET TERM ;^');
+      QWindow.Show;
+    end;
 end;
 
 (***************  Create new Trigger  ****************)
 
-function TfmMain.CreateNewTrigger(dbIndex: Integer; ATableName: string; OnCommitProcedure: TNotifyEvent = nil): Boolean;
+function TfmMain.CreateNewTrigger(dbIndex: integer; ATableName: string;
+  OnCommitProcedure: TNotifyEvent = nil): boolean;
 var
   QWindow: TfmQueryWindow;
   TrigType: string;
 begin
-  Result:= False;
+  Result := False;
   if ATableName <> '' then
   begin
     fmCreateTrigger.cbTables.Clear;
     fmCreateTrigger.cbTables.Items.Add(ATableName);
-    fmCreateTrigger.cbTables.ItemIndex:= 0;
+    fmCreateTrigger.cbTables.ItemIndex := 0;
   end;
   fmCreateTrigger.edTriggerName.Clear;
-  fmCreateTrigger.cxUpdate.Checked:= False;
-  fmCreateTrigger.cxInsert.Checked:= False;
-  fmCreateTrigger.cxDelete.Checked:= False;
+  fmCreateTrigger.cxUpdate.Checked := False;
+  fmCreateTrigger.cxInsert.Checked := False;
+  fmCreateTrigger.cxDelete.Checked := False;
 
-  if fmCreateTrigger.ShowModal = mrOK then
+  if fmCreateTrigger.ShowModal = mrOk then
   begin
-    Result:= True;
-    QWindow:= ShowQueryWindow(dbIndex, 'Create new Trigger');
+    Result := True;
+    QWindow := ShowQueryWindow(dbIndex, 'Create new Trigger');
     if fmCreateTrigger.rbAfter.Checked then
-      TrigType:= 'After'
+      TrigType := 'After'
     else
-      TrigType:= 'Before';
+      TrigType := 'Before';
     if fmCreateTrigger.cxInsert.Checked then
-      TrigType:= TrigType + ' insert or';
+      TrigType := TrigType + ' insert or';
     if fmCreateTrigger.cxUpdate.Checked then
-      TrigType:= TrigType + ' update or';
+      TrigType := TrigType + ' update or';
     if fmCreateTrigger.cxDelete.Checked then
-      TrigType:= TrigType + ' delete or';
+      TrigType := TrigType + ' delete or';
     Delete(TrigType, Length(TrigType) - 2, 3);
 
     QWindow.meQuery.Lines.Clear;
-    QWindow.meQuery.Lines.Add('CREATE TRIGGER ' + fmCreateTrigger.edTriggerName.Text + ' for ' +
-      fmCreateTrigger.cbTables.Text);
+    QWindow.meQuery.Lines.Add('CREATE TRIGGER ' + fmCreateTrigger.edTriggerName.Text +
+      ' for ' + fmCreateTrigger.cbTables.Text);
     QWindow.meQuery.Lines.Add('Active');
     QWindow.meQuery.Lines.Add(TrigType);
     QWindow.meQuery.Lines.Add('Position 0');
@@ -941,7 +973,7 @@ begin
     fmMain.Show;
 
     if OnCommitProcedure <> nil then
-      QWindow.OnCommit:= OnCommitProcedure;
+      QWindow.OnCommit := OnCommitProcedure;
   end;
 end;
 
@@ -950,15 +982,15 @@ end;
 procedure TfmMain.lmCreateTriggerClick(Sender: TObject);
 var
   SelNode: TTreeNode;
-  DBIndex: Integer;
+  DBIndex: integer;
   TableNames: string;
-  Count: Integer;
+  Count: integer;
 begin
-  SelNode:= tvMain.Selected;
-  DBIndex:= PtrInt(SelNode.Parent.Data);
+  SelNode := tvMain.Selected;
+  DBIndex := PtrInt(SelNode.Parent.Data);
 
-  TableNames:= dmSysTables.GetDBObjectNames(DBIndex, otTables, Count);
-  fmCreateTrigger.cbTables.Items.CommaText:= TableNames;
+  TableNames := dmSysTables.GetDBObjectNames(DBIndex, otTables, Count);
+  fmCreateTrigger.cbTables.Items.CommaText := TableNames;
   CreateNewTrigger(DBIndex, '');
 end;
 
@@ -970,28 +1002,28 @@ var
   QWindow: TfmQueryWindow;
   AViewName: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
-  if InputQuery('Create new view', 'Please enter new view name', AViewName) then
-  begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new view');
-    QWindow.meQuery.Lines.Clear;
-    QWindow.meQuery.Lines.Add('CREATE VIEW "' + AViewName + '" (');
-    QWindow.meQuery.Lines.Add('Field1Name, Field2Name) ');
-    QWindow.meQuery.Lines.Add('AS');
-    QWindow.meQuery.Lines.Add('SELECT Field1, Field2 FROM ATableName');
-    QWindow.meQuery.Lines.Add('-- WHERE condition');
-    QWindow.Show;
-  end;
+    if InputQuery('Create new view', 'Please enter new view name', AViewName) then
+    begin
+      QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new view');
+      QWindow.meQuery.Lines.Clear;
+      QWindow.meQuery.Lines.Add('CREATE VIEW "' + AViewName + '" (');
+      QWindow.meQuery.Lines.Add('Field1Name, Field2Name) ');
+      QWindow.meQuery.Lines.Add('AS');
+      QWindow.meQuery.Lines.Add('SELECT Field1, Field2 FROM ATableName');
+      QWindow.meQuery.Lines.Add('-- WHERE condition');
+      QWindow.Show;
+    end;
 end;
 
 procedure TfmMain.lmDeactiveTrigClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if ChangeTriggerActivity(PtrInt(SelNode.Parent.Parent.Data), SelNode.Text, False) then
-    MessageDlg('Trigger has been DeActivated', mtInformation, [mbOk], 0);
+    MessageDlg('Trigger has been DeActivated', mtInformation, [mbOK], 0);
 end;
 
 (***************  Display view top 1000 records  ************)
@@ -1001,11 +1033,12 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),  'Select first 1000 from ' + SelNode.Text);
-    QWindow.meQuery.Lines.Text:= 'select first 1000 * from "' + SelNode.Text + '"';
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+      'Select first 1000 from ' + SelNode.Text);
+    QWindow.meQuery.Lines.Text := 'select first 1000 * from "' + SelNode.Text + '"';
     QWindow.bbRunClick(nil);
     QWindow.Show;
   end;
@@ -1018,11 +1051,11 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
-  if MessageDlg('Are you sure you want to delete ' + SelNode.Text + ' permanently', mtConfirmation,
-    [mbYes, mbNo], 0) = mrYes then
+  SelNode := tvMain.Selected;
+  if MessageDlg('Are you sure you want to delete ' + SelNode.Text +
+    ' permanently', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Drop Exception');
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Drop Exception');
     QWindow.meQuery.Lines.Clear;
     QWindow.meQuery.Lines.Add('DROP EXCEPTION ' + SelNode.Text + ';');
     QWindow.Show;
@@ -1037,21 +1070,22 @@ var
   Rec: TDatabaseRec;
   EditForm: TfmEditDataFullRec;
   ATableName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    ATableName:= SelNode.Text;
-    Rec:= RegisteredDatabases[dbIndex];
-    EditForm:= TfmEditDataFullRec(FindCustomForm(Rec.RegRec.Title + ': Edit Data (Form) for Table : ' +
-      ATableName, TfmEditDataFullRec));
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    ATableName := SelNode.Text;
+    Rec := RegisteredDatabases[dbIndex];
+    EditForm := TfmEditDataFullRec(FindCustomForm(Rec.RegRec.Title +
+      ': Edit Data (Form) for Table : ' + ATableName, TfmEditDataFullRec));
     if EditForm = nil then
     begin
-      EditForm:= TfmEditDataFullRec.Create(Application);
+      EditForm := TfmEditDataFullRec.Create(Application);
       EditForm.Init(dbIndex, ATableName);
-      EditForm.Caption:= Rec.RegRec.Title + ': Edit Data (Form) for Table : ' + ATableName;
+      EditForm.Caption := Rec.RegRec.Title + ': Edit Data (Form) for Table : ' +
+        ATableName;
     end;
     EditForm.Show;
   end;
@@ -1066,22 +1100,22 @@ var
   SPOwner: string;
   spBody: string;
   QWindow: TfmQueryWindow;
-  DBIndex: Integer;
+  DBIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    AProcName:= SelNode.Text;
-    DBIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    SPBody:= GetStoredProcBody(DBIndex, AProcName, SPOwner);
+    AProcName := SelNode.Text;
+    DBIndex := PtrInt(SelNode.Parent.Parent.Data);
+    SPBody := GetStoredProcBody(DBIndex, AProcName, SPOwner);
 
     // Procedure body
-    QWindow:= ShowQueryWindow(DBIndex, 'Edit stored procedure ' + AProcName);
+    QWindow := ShowQueryWindow(DBIndex, 'Edit stored procedure ' + AProcName);
     QWindow.meQuery.Lines.Clear;
-  //  QWindow.meQuery.Lines.Add('SET TERM ^ ;');
+    //  QWindow.meQuery.Lines.Add('SET TERM ^ ;');
     QWindow.meQuery.Lines.Add('ALTER PROCEDURE ' + AProcName);
-    QWindow.meQuery.Text:= QWindow.meQuery.Text + Trim(spBody) + ';';
-   // QWindow.meQuery.Lines.Add('SET TERM ; ^');
+    QWindow.meQuery.Text := QWindow.meQuery.Text + Trim(spBody) + ';';
+    // QWindow.meQuery.Lines.Add('SET TERM ; ^');
 
     QWindow.Show;
   end;
@@ -1096,20 +1130,22 @@ var
   Rec: TDatabaseRec;
   EditWindow: TfmEditTable;
   ATableName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATableName:= SelNode.Text;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    Rec:= RegisteredDatabases[dbIndex];
-    EditWindow:= TfmEditTable(FindCustomForm(Rec.RegRec.Title + ': Edit Data for Table : ' + ATableName, TfmEditTable));
+    ATableName := SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    Rec := RegisteredDatabases[dbIndex];
+    EditWindow := TfmEditTable(FindCustomForm(Rec.RegRec.Title +
+      ': Edit Data for Table : ' + ATableName, TfmEditTable));
     if EditWindow = nil then
     begin
-      EditWindow:= TfmEditTable.Create(Application);
-      EditWindow.Rec:= Rec;
-      EditWindow.Caption:= EditWindow.Rec.RegRec.Title + ': Edit Data for Table : ' + ATableName;
+      EditWindow := TfmEditTable.Create(Application);
+      EditWindow.Rec := Rec;
+      EditWindow.Caption := EditWindow.Rec.RegRec.Title +
+        ': Edit Data for Table : ' + ATableName;
 
       EditWindow.Init(dbIndex, ATableName);
     end;
@@ -1125,14 +1161,16 @@ var
   QWindow: TfmQueryWindow;
   ATriggerName: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATriggerName:= SelNode.Text;
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Edit Trigger ' + ATriggerName);
+    ATriggerName := SelNode.Text;
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+      'Edit Trigger ' + ATriggerName);
 
     QWindow.meQuery.Lines.Clear;
-    dmSysTables.ScriptTrigger(PtrInt(SelNode.Parent.Parent.Data), ATriggerName, QWindow.meQuery.Lines);
+    dmSysTables.ScriptTrigger(PtrInt(SelNode.Parent.Parent.Data),
+      ATriggerName, QWindow.meQuery.Lines);
     QWindow.Show;
   end;
 
@@ -1147,11 +1185,12 @@ var
   AViewName: string;
   ViewBody, Columns: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    AViewName:= SelNode.Text;
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Edit view ' + AViewName);
+    AViewName := SelNode.Text;
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+      'Edit view ' + AViewName);
 
     GetViewInfo(PtrInt(SelNode.Parent.Parent.Data), AViewName, Columns, ViewBody);
     QWindow.meQuery.Lines.Clear;
@@ -1160,7 +1199,7 @@ begin
     QWindow.meQuery.Lines.Add('CREATE VIEW "' + AViewName + '" (' + Columns + ')');
     QWindow.meQuery.Lines.Add('AS');
 
-    QWindow.meQuery.Text:= QWindow.meQuery.Text + ViewBody;
+    QWindow.meQuery.Text := QWindow.meQuery.Text + ViewBody;
     QWindow.Show;
   end;
 
@@ -1168,88 +1207,90 @@ end;
 
 (***********  Show Indices Management  **************)
 
-procedure TfmMain.ShowIndicesManagement(AForm: TForm; DatabaseIndex: Integer; ATableName: string);
+procedure TfmMain.ShowIndicesManagement(AForm: TForm; DatabaseIndex: integer;
+  ATableName: string);
 var
   AQuery: TSQLQuery;
-  i: Integer;
+  i: integer;
   IndexFields: string;
   Rec: TDatabaseRec;
-  CurrentRow: Integer;
+  CurrentRow: integer;
   FieldsList: TStringList;
   ConstraintName: string;
   Form: TfmTableManage;
 begin
-  Form:= AForm as TfmTableManage;
-  Rec:= RegisteredDatabases[DatabaseIndex];
-  AQuery:= TSQLQuery.Create(nil);
+  Form := AForm as TfmTableManage;
+  Rec := RegisteredDatabases[DatabaseIndex];
+  AQuery := TSQLQuery.Create(nil);
   try
     AQuery.Close;
 
     if FIBConnection <> RegisteredDatabases[DatabaseIndex].IBConnection then
     begin
-      FIBConnection:= RegisteredDatabases[DatabaseIndex].IBConnection;
-      FSQLTransaction:= RegisteredDatabases[DatabaseIndex].SQLTrans;
+      FIBConnection := RegisteredDatabases[DatabaseIndex].IBConnection;
+      FSQLTransaction := RegisteredDatabases[DatabaseIndex].SQLTrans;
     end;
-    AQuery.DataBase:= FIBConnection;
+    AQuery.DataBase := FIBConnection;
     FSQLTransaction.Commit;
 
-    Form.sgIndices.RowCount:= 1;
+    Form.sgIndices.RowCount := 1;
 
     // Get primary key index name
-    Form.PKeyName:= GetPrimaryKeyIndexName(DatabaseIndex, ATableName, ConstraintName);
-    Form.ConstraintName:= ConstraintName;
+    Form.PKeyName := GetPrimaryKeyIndexName(DatabaseIndex, ATableName, ConstraintName);
+    Form.ConstraintName := ConstraintName;
 
     // Index names
     if GetIndices(ATableName, AQuery) then
-    with Form do
-    while not AQuery.EOF do
-    begin
-      if Trim(AQuery.FieldByName('RDB$Index_name').AsString) = PKeyName then
-      begin
-        sgIndices.InsertColRow(False, 1);
-        CurrentRow:= 1;
-      end
-      else
-      begin
-        sgIndices.RowCount:= sgIndices.RowCount + 1;
-        CurrentRow:= sgIndices.RowCount - 1;
-      end;
-      sgIndices.Cells[0, CurrentRow]:= Trim(AQuery.FieldByName('RDB$Index_Name').AsString);
-      if AQuery.FieldByName('RDB$Unique_Flag').AsString = '1' then
-        sgIndices.Cells[1, CurrentRow]:= '1'
-      else
-        sgIndices.Cells[1, CurrentRow]:= '0';
+      with Form do
+        while not AQuery.EOF do
+        begin
+          if Trim(AQuery.FieldByName('RDB$Index_name').AsString) = PKeyName then
+          begin
+            sgIndices.InsertColRow(False, 1);
+            CurrentRow := 1;
+          end
+          else
+          begin
+            sgIndices.RowCount := sgIndices.RowCount + 1;
+            CurrentRow := sgIndices.RowCount - 1;
+          end;
+          sgIndices.Cells[0, CurrentRow] :=
+            Trim(AQuery.FieldByName('RDB$Index_Name').AsString);
+          if AQuery.FieldByName('RDB$Unique_Flag').AsString = '1' then
+            sgIndices.Cells[1, CurrentRow] := '1'
+          else
+            sgIndices.Cells[1, CurrentRow] := '0';
 
-      if AQuery.FieldByName('RDB$Index_Type').AsString = '1' then
-        sgIndices.Cells[2, CurrentRow]:= 'Desc'
-      else
-        sgIndices.Cells[2, CurrentRow]:= 'Asc';
+          if AQuery.FieldByName('RDB$Index_Type').AsString = '1' then
+            sgIndices.Cells[2, CurrentRow] := 'Desc'
+          else
+            sgIndices.Cells[2, CurrentRow] := 'Asc';
 
-      if Trim(AQuery.FieldByName('RDB$Index_Name').AsString) = Form.PKeyName then
-        sgIndices.Cells[4, CurrentRow]:= '1'
-      else
-        sgIndices.Cells[4, CurrentRow]:= '0';
-      AQuery.Next;
-    end;
+          if Trim(AQuery.FieldByName('RDB$Index_Name').AsString) = Form.PKeyName then
+            sgIndices.Cells[4, CurrentRow] := '1'
+          else
+            sgIndices.Cells[4, CurrentRow] := '0';
+          AQuery.Next;
+        end;
 
-    FieldsList:= TStringList.Create;
+    FieldsList := TStringList.Create;
     try
       // Index fields
       with Form do
-      for i:= 1 to sgIndices.RowCount - 1 do
-      begin
-        IndexFields:= '';
-        if GetIndexFields(ATableName, sgIndices.Cells[0, i], AQuery, FieldsList) then
+        for i := 1 to sgIndices.RowCount - 1 do
         begin
-          IndexFields:= FieldsList.CommaText;
-          sgIndices.Cells[3, i]:= IndexFields;
+          IndexFields := '';
+          if GetIndexFields(ATableName, sgIndices.Cells[0, i], AQuery, FieldsList) then
+          begin
+            IndexFields := FieldsList.CommaText;
+            sgIndices.Cells[3, i] := IndexFields;
+          end;
         end;
-      end;
     finally
       FieldsList.Free;
     end;
 
-    Form.edIndexName.Text:= 'IX_' + ATableName + '_' + IntToStr(Form.sgIndices.RowCount);
+    Form.edIndexName.Text := 'IX_' + ATableName + '_' + IntToStr(Form.sgIndices.RowCount);
 
     // Field names
     GetFields(DatabaseIndex, ATableName, nil);
@@ -1271,7 +1312,7 @@ begin
   end;
 
   if Form.sgIndices.RowCount > 1 then
-    Form.sgIndices.Row:= 1;
+    Form.sgIndices.Row := 1;
 end;
 
 (**************  New Domain  *************)
@@ -1282,28 +1323,28 @@ var
   QWindow: TfmQueryWindow;
   Line: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
-  if fmNewDomain.ShowModal = mrOk then
-  with QWindow do
-  begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new domain');
-    meQuery.Lines.Clear;
-    Line:= 'CREATE DOMAIN ' + fmNewDomain.edName.Text + ' AS ' + fmNewDomain.cbType.Text;
-    if Pos('char', LowerCase(fmNewDomain.cbType.Text)) > 0 then
-      Line:= Line + '(' + IntToStr(fmNewDomain.seSize.Value) + ')';
-    meQuery.Lines.Add(Line);
+    if fmNewDomain.ShowModal = mrOk then
+      with QWindow do
+      begin
+        QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new domain');
+        meQuery.Lines.Clear;
+        Line := 'CREATE DOMAIN ' + fmNewDomain.edName.Text + ' AS ' + fmNewDomain.cbType.Text;
+        if Pos('char', LowerCase(fmNewDomain.cbType.Text)) > 0 then
+          Line := Line + '(' + IntToStr(fmNewDomain.seSize.Value) + ')';
+        meQuery.Lines.Add(Line);
 
-    if Trim(fmNewDomain.edDefault.Text) <> '' then
-    begin
-      if (Pos('char', LowerCase(fmNewDomain.cbType.Text)) > 0) or
-        (LowerCase(fmNewDomain.cbType.Text)='cstring') then
-        meQuery.Lines.Add('DEFAULT ' + QuotedStr(fmNewDomain.edDefault.Text))
-      else
-        meQuery.Lines.Add('DEFAULT ' + fmNewDomain.edDefault.Text);
-    end;
-    Show;
-  end;
+        if Trim(fmNewDomain.edDefault.Text) <> '' then
+        begin
+          if (Pos('char', LowerCase(fmNewDomain.cbType.Text)) > 0) or
+            (LowerCase(fmNewDomain.cbType.Text) = 'cstring') then
+            meQuery.Lines.Add('DEFAULT ' + QuotedStr(fmNewDomain.edDefault.Text))
+          else
+            meQuery.Lines.Add('DEFAULT ' + fmNewDomain.edDefault.Text);
+        end;
+        Show;
+      end;
 end;
 
 (***********  Add New exception  ****************)
@@ -1313,12 +1354,13 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new Exception');
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new Exception');
     QWindow.meQuery.Lines.Clear;
-    QWindow.meQuery.Lines.Add('CREATE EXCEPTION Exception_name_1 ''exception message'';');
+    QWindow.meQuery.Lines.Add(
+      'CREATE EXCEPTION Exception_name_1 ''exception message'';');
     QWindow.Show;
   end;
 end;
@@ -1326,11 +1368,11 @@ end;
 
 (**************  Initialize New Generator form  *************)
 
-procedure TfmMain.InitNewGen(DatabaseIndex: Integer);
+procedure TfmMain.InitNewGen(DatabaseIndex: integer);
 var
   Rec: TDatabaseRec;
 begin
-  Rec:= RegisteredDatabases[DatabaseIndex];
+  Rec := RegisteredDatabases[DatabaseIndex];
 
   fmNewGen.Init(DatabaseIndex);
 end;
@@ -1340,9 +1382,9 @@ end;
 function TfmMain.GetServerName(DBName: string): string;
 begin
   if Pos(':', DBName) > 2 then
-    Result:= Copy(DBName, 1, Pos(':', DBName) - 1)
+    Result := Copy(DBName, 1, Pos(':', DBName) - 1)
   else
-    Result:= 'localhost';
+    Result := 'localhost';
 end;
 
 
@@ -1352,49 +1394,49 @@ function TfmMain.GetServerNameNode(ServerName: string): TTreeNode;
 var
   Node: TTreeNode;
 begin
-  Node:= nil;
-  ServerName:= LowerCase(ServerName);
+  Node := nil;
+  ServerName := LowerCase(ServerName);
   if tvMain.Items.Count > 0 then
-    Node:= tvMain.Items[0];
-  Result:= nil;
+    Node := tvMain.Items[0];
+  Result := nil;
   while Node <> nil do
   begin
     if (Node.Text <> '') and (LowerCase(Node.Text) = ServerName) then
     begin
-      Result:= Node;
+      Result := Node;
       Break;
     end;
-    Node:= Node.GetNextSibling;
+    Node := Node.GetNextSibling;
   end;
 end;
 
 procedure TfmMain.ReleaseRegisteredDatabases;
 var
-  i: Integer;
+  i: integer;
 begin
-  for i:= 0 to High(RegisteredDatabases) do
+  for i := 0 to High(RegisteredDatabases) do
   begin
     RegisteredDatabases[i].IBConnection.Close;
     RegisteredDatabases[i].SQLTrans.Free;
     RegisteredDatabases[i].IBConnection.Free;
   end;
 
-  RegisteredDatabases:= nil;
+  RegisteredDatabases := nil;
 
 end;
 
-procedure TfmMain.SetConnection(Index: Integer);
+procedure TfmMain.SetConnection(Index: integer);
 begin
   if FIBConnection <> RegisteredDatabases[Index].IBConnection then
   begin
-    FIBConnection:= RegisteredDatabases[Index].IBConnection;
+    FIBConnection := RegisteredDatabases[Index].IBConnection;
     // This used to say FIBConnection.Close which will simply also close all open
     // queries - not a good idea
     //FIBConnection.Close;
-    FSQLTransaction:= RegisteredDatabases[Index].SQLTrans;
-    FIBConnection.Transaction:= FSQLTransaction;
-    SQLQuery1.DataBase:= FIBConnection;
-    SQLQuery1.Transaction:= FSQLTransaction;
+    FSQLTransaction := RegisteredDatabases[Index].SQLTrans;
+    FIBConnection.Transaction := FSQLTransaction;
+    SQLQuery1.DataBase := FIBConnection;
+    SQLQuery1.Transaction := FSQLTransaction;
   end;
 end;
 
@@ -1405,19 +1447,20 @@ begin
 end;
 
 procedure TfmMain.GetLogEvent(Sender: TSQLConnection; EventType: TDBEventType;
-  const Msg: String);
+  const Msg: string);
 // Used to log everything sent through the connection
 var
   Source: string;
 begin
   case EventType of
-    detCustom:   Source:='Custom:   ';
-    detPrepare:  Source:='Prepare:  ';
-    detExecute:  Source:='Execute:  ';
-    detFetch:    Source:='Fetch:    ';
-    detCommit:   Source:='Commit:   ';
-    detRollBack: Source:='Rollback: ';
-    else Source:='Unknown event. Please fix program code.';
+    detCustom: Source := 'Custom:   ';
+    detPrepare: Source := 'Prepare:  ';
+    detExecute: Source := 'Execute:  ';
+    detFetch: Source := 'Fetch:    ';
+    detCommit: Source := 'Commit:   ';
+    detRollBack: Source := 'Rollback: ';
+    else
+      Source := 'Unknown event. Please fix program code.';
   end;
   try
     SendDebug(Source + Msg);
@@ -1429,14 +1472,16 @@ end;
 
 (* Insert SQL query into database history file *)
 
-function TfmMain.AddToSQLHistory(DatabaseTitle: string; SQLType, SQLStatement: string): Boolean;
+function TfmMain.AddToSQLHistory(DatabaseTitle: string;
+  SQLType, SQLStatement: string): boolean;
 begin
   try
-    Result:= OpenSQLHistory(DatabaseTitle);
+    Result := OpenSQLHistory(DatabaseTitle);
     if Result then
     begin
       mdsHistory.Last;
-      if (SQLType <> 'SELECT') or (mdsHistory.FieldByName('SQLStatement').AsString <> SQLStatement) then
+      if (SQLType <> 'SELECT') or (mdsHistory.FieldByName('SQLStatement').AsString <>
+        SQLStatement) then
       begin
         mdsHistory.AppendRecord([Now, SQLType, SQLStatement, 0]);
         if SQLType = 'DDL' then
@@ -1447,26 +1492,26 @@ begin
   except
     on E: Exception do
     begin
-      Result:= False;
+      Result := False;
       ShowMessage(e.Message);
     end;
   end;
 end;
 
-function TfmMain.SaveAndCloseSQLHistory: Boolean;
+function TfmMain.SaveAndCloseSQLHistory: boolean;
 begin
   try
     if mdsHistory.Active then
       mdsHistory.SaveToFile(FCurrentHistoryFile);
 
     mdsHistory.Close;
-    Result:= True;
+    Result := True;
 
   except
     on E: Exception do
     begin
-      Result:= False;
-      ShowMessage(e.Message)
+      Result := False;
+      ShowMessage(e.Message);
     end;
   end;
 end;
@@ -1474,46 +1519,47 @@ end;
 
 (* Open SQL history file for current database *)
 
-function TfmMain.OpenSQLHistory(DatabaseTitle: string): Boolean;
+function TfmMain.OpenSQLHistory(DatabaseTitle: string): boolean;
 var
   AFileName: string;
-  i: Integer;
+  i: integer;
 
   // Removes spaces, braces, brackets etc
   function RemoveSpecialChars(AText: string): string;
   var
-    i: Integer;
+    i: integer;
   begin
-    for i:= Length(AText) to 1 do
+    for i := Length(AText) to 1 do
       if Pos(AText[i], ' !@#$%^&*()[]{}/?<>:;"|\,.~`''') > 0 then
         System.Delete(AText, i, 1);
-    Result:= AText;
+    Result := AText;
   end;
 
 begin
   try
-    AFileName:= getConfigurationDirectory + LowerCase(RemoveSpecialChars(DatabaseTitle)) + '.history';
+    AFileName := getConfigurationDirectory +
+      LowerCase(RemoveSpecialChars(DatabaseTitle)) + '.history';
 
     // Different opened history file
     if mdsHistory.Active and (AFileName <> FCurrentHistoryFile) then
     begin
       if FCurrentHistoryFile <> '' then
         mdsHistory.SaveToFile(FCurrentHistoryFile);
-       mdsHistory.Close;
+      mdsHistory.Close;
     end;
 
     if not mdsHistory.Active then
-    if FileExists(AFileName) then
-    begin
-      try
-        mdsHistory.LoadFromFile(AFileName);
-      except
-        on E: Exception do
-          mdsHistory.SaveToFile(AFileName);
-      end;
-    end
-    else
-      mdsHistory.CreateTable;
+      if FileExists(AFileName) then
+      begin
+        try
+          mdsHistory.LoadFromFile(AFileName);
+        except
+          on E: Exception do
+            mdsHistory.SaveToFile(AFileName);
+        end;
+      end
+      else
+        mdsHistory.CreateTable;
 
     if not mdsHistory.Active then
       mdsHistory.Open;
@@ -1521,15 +1567,15 @@ begin
     if mdsHistory.RecNo > 10000 then
     begin
       mdsHistory.First;
-      for i:= 1 to 2 do
+      for i := 1 to 2 do
         mdsHistory.Delete;
     end;
-    FCurrentHistoryFile:= AFileName;
-    Result:= True;
+    FCurrentHistoryFile := AFileName;
+    Result := True;
   except
     on E: Exception do
     begin
-      Result:= False;
+      Result := False;
       ShowMessage(e.Message);
     end;
   end;
@@ -1540,28 +1586,28 @@ end;
 
 function TfmMain.RetrieveInputParamFromSP(Body: string): string;
 var
-  i: Integer;
-  SizeStarted: Boolean;
+  i: integer;
+  SizeStarted: boolean;
 begin
-  SizeStarted:= False;
+  SizeStarted := False;
   if (Pos('(', Body) > 0) and (Pos('(', Body) < Pos(')', Body)) then
-  for i:= 1 to Length(Body) do
-  begin
-    if (Body[i] = ')') and (not SizeStarted) then
+    for i := 1 to Length(Body) do
     begin
-      Result:= Trim(Copy(Body, 1, i - 1));
-      Break;
-    end;
+      if (Body[i] = ')') and (not SizeStarted) then
+      begin
+        Result := Trim(Copy(Body, 1, i - 1));
+        Break;
+      end;
 
-    if (Body[i] = ')') and (SizeStarted) then
-      SizeStarted:= False;
+      if (Body[i] = ')') and (SizeStarted) then
+        SizeStarted := False;
 
-    if Body[i] = '(' then
-      SizeStarted:= True;
+      if Body[i] = '(' then
+        SizeStarted := True;
 
-  end
+    end
   else
-    Result:= Trim(Copy(Body, 1, Pos(')', Body) - 1));
+    Result := Trim(Copy(Body, 1, Pos(')', Body) - 1));
 end;
 
 (**************  New Generator  *******************)
@@ -1570,13 +1616,13 @@ procedure TfmMain.lmNewGenClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
     InitNewGen(PtrInt(SelNode.Parent.Data));
     fmNewGen.edGenName.Clear;
-    fmNewGen.edGenName.Enabled:= True;
-    fmNewGen.cxTrigger.Checked:= False;
+    fmNewGen.edGenName.Enabled := True;
+    fmNewGen.cxTrigger.Checked := False;
     fmNewGen.ShowModal;
   end;
 end;
@@ -1587,41 +1633,41 @@ procedure TfmMain.lmNewTableClick(Sender: TObject);
 var
   Rec: TDatabaseRec;
   SelNode: TTreeNode;
-  dbIndex: Integer;
+  dbIndex: integer;
   Form: TfmNewTable;
   Title: string;
   ATab: TTabSheet;
 begin
-  SelNode:= tvMain.Selected;
-  dbIndex:= PtrInt(SelNode.Parent.Data);
-  Rec:= RegisteredDatabases[dbIndex];
+  SelNode := tvMain.Selected;
+  dbIndex := PtrInt(SelNode.Parent.Data);
+  Rec := RegisteredDatabases[dbIndex];
 
-  Title:= SelNode.Parent.Text + ': New Table';
+  Title := SelNode.Parent.Text + ': New Table';
 
-  Form:= FindCustomForm(Title, TfmNewTable) as TfmNewTable;
+  Form := FindCustomForm(Title, TfmNewTable) as TfmNewTable;
   if Form = nil then
   begin
-    Form:= TfmNewTable.Create(Application);
-    ATab:= TTabSheet.Create(self);
-    ATab.Parent:= PageControl1;
-    Form.Parent:= ATab;
-    Form.Caption:= Title;
-    ATab.Caption:= Form.Caption;
-    Form.Left:= 0;
-    Form.Top:= 0;
-    Form.BorderStyle:= bsNone;
-    Form.Align:= alClient;
+    Form := TfmNewTable.Create(Application);
+    ATab := TTabSheet.Create(self);
+    ATab.Parent := PageControl1;
+    Form.Parent := ATab;
+    Form.Caption := Title;
+    ATab.Caption := Form.Caption;
+    Form.Left := 0;
+    Form.Top := 0;
+    Form.BorderStyle := bsNone;
+    Form.Align := alClient;
     Form.Init(dbIndex);
   end
   else
-    ATab:= Form.Parent as TTabSheet;
-  PageControl1.ActivePage:= ATab;
+    ATab := Form.Parent as TTabSheet;
+  PageControl1.ActivePage := ATab;
   Form.Show;
   Form.edNewTable.SetFocus;
 
 
-  ATab.Tag:= dbIndex;
-  PageControl1.ActivePage:= ATab;
+  ATab.Tag := dbIndex;
+  PageControl1.ActivePage := ATab;
 
 end;
 
@@ -1634,23 +1680,25 @@ var
   AFuncName: string;
   ModuleName, EntryPoint: string;
 begin
-  SelNode:= tvMain.Selected;
-  ModuleName:= '<modulename>';
-  EntryPoint:= '<entryname>';
+  SelNode := tvMain.Selected;
+  ModuleName := '<modulename>';
+  EntryPoint := '<entryname>';
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
-  if InputQuery('Create new function', 'Please enter new function name', AFuncName) then
-  if InputQuery('Create new function', 'Please enter module name (Library)', ModuleName) then
-  if InputQuery('Create new function', 'Please enter entry point (External function name)', EntryPoint) then
-  begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new function');
-    QWindow.meQuery.Lines.Clear;
-    QWindow.meQuery.Lines.Add('DECLARE EXTERNAL FUNCTION "' + AFuncName + '"');
-    QWindow.meQuery.Lines.Add('-- (int, varchar(100))');
-    QWindow.meQuery.Lines.Add('RETURNS (int)');
-    QWindow.meQuery.Lines.Add('ENTRY_POINT ' + QuotedStr(entryPoint));
-    QWindow.meQuery.Lines.Add('MODULE_NAME ' + QuotedStr(modulename) + ';');
-    QWindow.Show;
-  end;
+    if InputQuery('Create new function', 'Please enter new function name', AFuncName) then
+      if InputQuery('Create new function', 'Please enter module name (Library)',
+        ModuleName) then
+        if InputQuery('Create new function',
+          'Please enter entry point (External function name)', EntryPoint) then
+        begin
+          QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new function');
+          QWindow.meQuery.Lines.Clear;
+          QWindow.meQuery.Lines.Add('DECLARE EXTERNAL FUNCTION "' + AFuncName + '"');
+          QWindow.meQuery.Lines.Add('-- (int, varchar(100))');
+          QWindow.meQuery.Lines.Add('RETURNS (int)');
+          QWindow.meQuery.Lines.Add('ENTRY_POINT ' + QuotedStr(entryPoint));
+          QWindow.meQuery.Lines.Add('MODULE_NAME ' + QuotedStr(modulename) + ';');
+          QWindow.Show;
+        end;
 end;
 
 (**********  Open Query 2 Click ************)
@@ -1662,94 +1710,96 @@ procedure TfmMain.lmOpenQueryClick(Sender: TObject);
 var
   QWindow: TfmQueryWindow;
   Rec: TRegisteredDatabase;
-  Count: Integer;
-  dbIndex: Integer;
+  Count: integer;
+  dbIndex: integer;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Data);
-  Rec:= RegisteredDatabases[dbIndex].RegRec;
+  dbIndex := PtrInt(tvMain.Selected.Data);
+  Rec := RegisteredDatabases[dbIndex].RegRec;
   // Password form
   if (Rec.Password = '') and (not tvMain.Selected.Expanded) then
   begin
     fmEnterPass.edPassword.Clear;
     try
-      fmEnterPass.cbRole.Items.CommaText:= dmSysTables.GetDBObjectNames(dbIndex, otRoles, Count);
+      fmEnterPass.cbRole.Items.CommaText :=
+        dmSysTables.GetDBObjectNames(dbIndex, otRoles, Count);
     except
     end;
     if fmEnterPass.ShowModal = mrOk then
     begin
-      if fmReg.TestConnection(Rec.DatabaseName, fmEnterPass.edUser.Text, fmEnterPass.edPassword.Text,
-        Rec.Charset) then
-          RegisteredDatabases[dbIndex].RegRec.Password:= fmEnterPass.edPassword.Text
-        else
-          Exit;
+      if fmReg.TestConnection(Rec.DatabaseName, fmEnterPass.edUser.Text,
+        fmEnterPass.edPassword.Text, Rec.Charset) then
+        RegisteredDatabases[dbIndex].RegRec.Password := fmEnterPass.edPassword.Text
+      else
+        Exit;
     end;
   end;
-  QWindow:= ShowQueryWindow(dbIndex, 'Query Window');
+  QWindow := ShowQueryWindow(dbIndex, 'Query Window');
   QWindow.Show;
 end;
 
 procedure TfmMain.lmPermissionsClick(Sender: TObject);
 var
-  dbIndex: Integer;
+  dbIndex: integer;
   Form: TfmUserPermissions;
   List: TStringList;
   UserName: string;
-  i: Integer;
+  i: integer;
   Permission: string;
-  ObjType: Integer;
+  ObjType: integer;
   ObjTypeName: string;
   ObjName: string;
   ATab: TTabSheet;
   Title: string;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Parent.Parent.Data);
-  UserName:= tvMain.Selected.Text;
-  List:= TStringList.Create;
+  dbIndex := PtrInt(tvMain.Selected.Parent.Parent.Data);
+  UserName := tvMain.Selected.Text;
+  List := TStringList.Create;
   try
-    List.CommaText:= dmSysTables.GetUserObjects(dbIndex, UserName);
-    Title:= 'Permissions for: ' + UserName;
+    List.CommaText := dmSysTables.GetUserObjects(dbIndex, UserName);
+    Title := 'Permissions for: ' + UserName;
 
-    Form:= FindCustomForm(Title, TfmUserPermissions) as TfmUserPermissions;
+    Form := FindCustomForm(Title, TfmUserPermissions) as TfmUserPermissions;
     if Form = nil then
     begin
-      Form:= TfmUserPermissions.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      Form.Parent:= ATab;
-      Form.Caption:= Title;
-      ATab.Caption:= Form.Caption;
-      Form.Left:= 0;
-      Form.Top:= 0;
-      Form.BorderStyle:= bsNone;
-      Form.Align:= alClient;
+      Form := TfmUserPermissions.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      Form.Parent := ATab;
+      Form.Caption := Title;
+      ATab.Caption := Form.Caption;
+      Form.Left := 0;
+      Form.Top := 0;
+      Form.BorderStyle := bsNone;
+      Form.Align := alClient;
     end
     else
-      ATab:= Form.Parent as TTabSheet;
+      ATab := Form.Parent as TTabSheet;
 
-    ATab.Tag:= dbIndex;
-    PageControl1.ActivePage:= ATab;
-    Form.StringGrid1.RowCount:= 1;
-    Form.laObject.Caption:= UserName;
+    ATab.Tag := dbIndex;
+    PageControl1.ActivePage := ATab;
+    Form.StringGrid1.RowCount := 1;
+    Form.laObject.Caption := UserName;
     with Form do
-    for i:= 0 to List.Count - 1 do
-    begin
-      ObjName:= List[i];
-      if Pos('<G>', ObjName) = 1 then
-        Delete(ObjName, 1, 3);
-      Permission:= dmSysTables.GetObjectUserPermission(dbIndex, ObjName, UserName, ObjType);
-      StringGrid1.RowCount:= StringGrid1.RowCount + 1;
+      for i := 0 to List.Count - 1 do
+      begin
+        ObjName := List[i];
+        if Pos('<G>', ObjName) = 1 then
+          Delete(ObjName, 1, 3);
+        Permission := dmSysTables.GetObjectUserPermission(dbIndex, ObjName,
+          UserName, ObjType);
+        StringGrid1.RowCount := StringGrid1.RowCount + 1;
 
-      case ObjType of
-        0: ObjTypeName:= 'Table/View';
-        5: ObjTypeName:= 'Procedure';
-        13: ObjTypeName:= 'Role';
-      else
-        ObjTypeName:= IntToStr(ObjType);
+        case ObjType of
+          0: ObjTypeName := 'Table/View';
+          5: ObjTypeName := 'Procedure';
+          13: ObjTypeName := 'Role';
+          else
+            ObjTypeName := IntToStr(ObjType);
+        end;
+        StringGrid1.Cells[0, i + 1] := ObjTypeName;
+        StringGrid1.Cells[1, i + 1] := ObjName;
+        StringGrid1.Cells[2, i + 1] := Permission;
       end;
-      StringGrid1.Cells[0, i + 1]:= ObjTypeName;
-      StringGrid1.Cells[1, i + 1]:= ObjName;
-      StringGrid1.Cells[2, i + 1]:= Permission;
-    end;
     Form.Show;
   finally
     List.Free;
@@ -1762,20 +1812,20 @@ procedure TfmMain.lmRefreshClick(Sender: TObject);
 begin
   if tvMain.Selected.Expanded then
     tvMain.Selected.Collapse(False);
-  tvMainExpanded(nil, tvMain.Selected)
+  tvMainExpanded(nil, tvMain.Selected);
 end;
 
 procedure TfmMain.lmRegdbClick(Sender: TObject);
 begin
-  fmReg.edDatabaseName.Text:= tvMain.Selected.Text + ':';
+  fmReg.edDatabaseName.Text := tvMain.Selected.Text + ':';
   mnRegDBClick(nil);
 end;
 
 procedure TfmMain.lmRestoreClick(Sender: TObject);
 begin
-  fmBackupRestore.Init('', tvMain.Selected.Text +  ':', '', '');
-  fmBackupRestore.cbOperation.ItemIndex:= 1;
-  fmBackupRestore.cbOperation.Enabled:= False;
+  fmBackupRestore.Init('', tvMain.Selected.Text + ':', '', '');
+  fmBackupRestore.cbOperation.ItemIndex := 1;
+  fmBackupRestore.cbOperation.Enabled := False;
   fmBackupRestore.meLog.Clear;
   fmBackupRestore.Show;
 end;
@@ -1785,27 +1835,27 @@ var
   fmPermissions: TfmPermissionManage;
   ATab: TTabSheet;
   Title: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  Title:= 'Permission management for: ' + tvMain.Selected.Text;
-  fmPermissions:= FindCustomForm(Title, TfmPermissionManage) as TfmPermissionManage;
+  Title := 'Permission management for: ' + tvMain.Selected.Text;
+  fmPermissions := FindCustomForm(Title, TfmPermissionManage) as TfmPermissionManage;
   if fmPermissions = nil then
   begin
-    fmPermissions:= TfmPermissionManage.Create(nil);
-    ATab:= TTabSheet.Create(self);
-    ATab.Parent:= PageControl1;
-    fmPermissions.Parent:= ATab;
-    fmPermissions.Left:= 0;
-    fmPermissions.Top:= 0;
-    fmPermissions.BorderStyle:= bsNone;
-    fmPermissions.Align:= alClient;
-    ATab.Caption:= Title;
+    fmPermissions := TfmPermissionManage.Create(nil);
+    ATab := TTabSheet.Create(self);
+    ATab.Parent := PageControl1;
+    fmPermissions.Parent := ATab;
+    fmPermissions.Left := 0;
+    fmPermissions.Top := 0;
+    fmPermissions.BorderStyle := bsNone;
+    fmPermissions.Align := alClient;
+    ATab.Caption := Title;
   end
   else
-    ATab:= fmViewGen.Parent as TTabSheet;
-  PageControl1.ActivePage:= ATab;
-  dbIndex:= PtrInt(tvMain.Selected.Parent.Parent.Data);
-  ATab.Tag:= dbIndex;
+    ATab := fmViewGen.Parent as TTabSheet;
+  PageControl1.ActivePage := ATab;
+  dbIndex := PtrInt(tvMain.Selected.Parent.Parent.Data);
+  ATab.Tag := dbIndex;
   fmPermissions.Init(dbIndex, '', tvMain.Selected.Text, 2);
   fmPermissions.Show;
 end;
@@ -1821,19 +1871,20 @@ procedure TfmMain.lmScriptDatabaseClick(Sender: TObject);
 var
   QueryWindow: TfmQueryWindow;
   List: TStringList;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Data);
-  QueryWindow:= ShowQueryWindow(dbIndex, 'Database Script');
-  Screen.Cursor:= crSQLWait;
-  List:= TStringList.Create;
+  dbIndex := PtrInt(tvMain.Selected.Data);
+  QueryWindow := ShowQueryWindow(dbIndex, 'Database Script');
+  Screen.Cursor := crSQLWait;
+  List := TStringList.Create;
   try //...finally for resource release
     try //...except for error reporting
       Application.ProcessMessages;
       with QueryWindow.meQuery do
       begin
         ClearAll;
-        Lines.Add('-- ' + tvMain.Selected.Text + ' database script. Generated on: ' + DateTimeToStr(Now) );
+        Lines.Add('-- ' + tvMain.Selected.Text + ' database script. Generated on: ' +
+          DateTimeToStr(Now));
 
         Lines.Add('');
         Lines.Add('--     Roles');
@@ -1918,12 +1969,12 @@ begin
     except
       on E: Exception do
       begin
-        Screen.Cursor:= crDefault;
+        Screen.Cursor := crDefault;
         ShowMessage(E.Message);
       end;
     end;
   finally
-    Screen.Cursor:= crDefault;
+    Screen.Cursor := crDefault;
     List.Free;
   end;
 end;
@@ -1935,10 +1986,11 @@ var
   SelNode: TTreeNode;
   Script, Msg, Desc: string;
 begin
-  SelNode:= tvMain.Selected;
-  if dmSysTables.GetExceptionInfo(PtrInt(tvMain.Selected.Data), SelNode.Text,
-    Msg, Desc, Script, false) then
-    ShowCompleteQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Script Exception ' + SelNode.Text, Script, nil);
+  SelNode := tvMain.Selected;
+  if dmSysTables.GetExceptionInfo(PtrInt(tvMain.Selected.Data),
+    SelNode.Text, Msg, Desc, Script, False) then
+    ShowCompleteQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+      'Script Exception ' + SelNode.Text, Script, nil);
 end;
 
 (**************  Script table as Insert stored procedure ************)
@@ -1951,57 +2003,58 @@ var
   FieldLine: string;
   FieldNames: string;
   ParamNames: string;
-  Skipped: Boolean;
-  dbIndex: Integer;
+  Skipped: boolean;
+  dbIndex: integer;
   LastParam: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATableName:= SelNode.Text;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    QWindow:= ShowQueryWindow(dbIndex, 'Script Table as insert : ' + ATableName);
+    ATableName := SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    QWindow := ShowQueryWindow(dbIndex, 'Script Table as insert : ' + ATableName);
     GetFields(dbIndex, ATableName, nil);
     QWindow.meQuery.Lines.Clear;
     QWindow.meQuery.Lines.Add('create procedure InsertTo' + ATableName + ' (');
 
     // Params
-    FieldNames:= '';
-    ParamNames:= '';
+    FieldNames := '';
+    ParamNames := '';
     with SQLQuery1 do
-    while not EOF do
-    begin
-      Skipped:= False;
-      if (FieldByName('computed_source').AsString = '') then
+      while not EOF do
       begin
-        FieldNames:= FieldNames + Trim(FieldByName('Field_Name').AsString);
-        ParamNames:= ParamNames + ':' + Trim(FieldByName('Field_Name').AsString);
-        FieldLine:= Trim(FieldByName('Field_Name').AsString) + ' ';
-        FieldLine:= FieldLine +
-          GetFBTypeName(SQLQuery1.FieldByName('field_type_int').AsInteger,
+        Skipped := False;
+        if (FieldByName('computed_source').AsString = '') then
+        begin
+          FieldNames := FieldNames + Trim(FieldByName('Field_Name').AsString);
+          ParamNames := ParamNames + ':' + Trim(FieldByName('Field_Name').AsString);
+          FieldLine := Trim(FieldByName('Field_Name').AsString) + ' ';
+          FieldLine := FieldLine + GetFBTypeName(
+            SQLQuery1.FieldByName('field_type_int').AsInteger,
             SQLQuery1.FieldByName('field_sub_type').AsInteger,
             SQLQuery1.FieldByName('field_length').AsInteger,
             SQLQuery1.FieldByName('field_precision').AsInteger,
             SQLQuery1.FieldByName('field_scale').AsInteger);
-        if FieldByName('field_type_int').AsInteger in [CStringType,CharType,VarCharType] then
-          FieldLine:= FieldLine + '(' + FieldByName('CharacterLength').AsString + ') ';
-      end
-      else
-        Skipped:= True;
+          if FieldByName('field_type_int').AsInteger in
+            [CStringType, CharType, VarCharType] then
+            FieldLine := FieldLine + '(' + FieldByName('CharacterLength').AsString + ') ';
+        end
+        else
+          Skipped := True;
 
-      Next;
+        Next;
 
-      if not Skipped then
-      begin
-        if not EOF then
+        if not Skipped then
         begin
-          FieldLine:= FieldLine + ',';
-          FieldNames:= FieldNames + ', ';
-          ParamNames:= ParamNames + ', ';
+          if not EOF then
+          begin
+            FieldLine := FieldLine + ',';
+            FieldNames := FieldNames + ', ';
+            ParamNames := ParamNames + ', ';
+          end;
+          QWindow.meQuery.Lines.Add(FieldLine);
         end;
-        QWindow.meQuery.Lines.Add(FieldLine);
       end;
-    end;
     SQLQuery1.Close;
 
     // Remote last , if any
@@ -2012,11 +2065,11 @@ begin
     end;
 
     // Remove last , if any
-    LastParam:= QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1];
+    LastParam := QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1];
     if Pos(',', LastParam) > 0 then
     begin
-      LastParam:= StringReplace(LastParam, ',', '', []);
-      QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1]:= LastParam;
+      LastParam := StringReplace(LastParam, ',', '', []);
+      QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1] := LastParam;
     end;
 
     QWindow.meQuery.Lines.Add(')');
@@ -2037,27 +2090,27 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
   ATableName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
   ScriptList: TStringList;
   Line: string;
   PKIndexName: string;
   ConstraintName: string;
   List: TStringList;
-  i: Integer;
+  i: integer;
   UserName: string;
-  ObjType: Integer;
+  ObjType: integer;
   Triggers: TStringList;
-  j: Integer;
+  j: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATableName:= SelNode.Text;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    ScriptList:= TStringList.Create;
+    ATableName := SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    ScriptList := TStringList.Create;
     try
       ScriptTableAsCreate(dbIndex, ATableName, ScriptList);
-      QWindow:= ShowQueryWindow(dbIndex, 'Script Table as Create: ' + ATableName);
+      QWindow := ShowQueryWindow(dbIndex, 'Script Table as Create: ' + ATableName);
       QWindow.meQuery.Lines.Clear;
       QWindow.meQuery.Lines.AddStrings(ScriptList);
 
@@ -2066,48 +2119,52 @@ begin
       SQLQuery1.Close;
       dmSysTables.GetTableConstraints(ATableName, dmSysTables.sqQuery);
       with dmSysTables do
-      while not sqQuery.EOF do
-      begin
-         Line:= 'alter table ' + ATableName + ' add constraint ' + sqQuery.Fields[0].AsString +
-           ' foreign key (' + sqQuery.Fields[3].AsString + ') references ' +  sqQuery.Fields[4].AsString  +
-           ' (' + dmSysTables.GetConstraintForeignKeyFields(sqQuery.Fields[5].AsString, fmMain.SQLQuery1) + ') ';
-         if Trim(sqQuery.Fields[6].AsString) <> 'RESTRICT' then
-           Line:= Line + ' on update ' + Trim(sqQuery.Fields[6].AsString);
-         if Trim(sqQuery.Fields[7].AsString) <> 'RESTRICT' then
-           Line:= Line + ' on delete ' + Trim(sqQuery.Fields[7].AsString);
-         QWindow.meQuery.Lines.Add(Line + ';');
-         sqQuery.Next;
-      end;
+        while not sqQuery.EOF do
+        begin
+          Line := 'alter table ' + ATableName + ' add constraint ' +
+            sqQuery.Fields[0].AsString + ' foreign key (' +
+            sqQuery.Fields[3].AsString + ') references ' + sqQuery.Fields[4].AsString +
+            ' (' + dmSysTables.GetConstraintForeignKeyFields(
+            sqQuery.Fields[5].AsString, fmMain.SQLQuery1) + ') ';
+          if Trim(sqQuery.Fields[6].AsString) <> 'RESTRICT' then
+            Line := Line + ' on update ' + Trim(sqQuery.Fields[6].AsString);
+          if Trim(sqQuery.Fields[7].AsString) <> 'RESTRICT' then
+            Line := Line + ' on delete ' + Trim(sqQuery.Fields[7].AsString);
+          QWindow.meQuery.Lines.Add(Line + ';');
+          sqQuery.Next;
+        end;
       dmSysTables.sqQuery.Close;
       SQLQuery1.Close;
       QWindow.meQuery.Lines.Add('');
 
       // Script indices
-      PKIndexName:= GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
-      List:= TStringList.Create;
+      PKIndexName := GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
+      List := TStringList.Create;
       try
         with dmSysTables do
-        if fmMain.GetIndices(ATableName, sqQuery) then
-        with sqQuery do
-        while not EOF do
-        begin
-          if PKIndexName <> Trim(FieldByName('RDB$Index_name').AsString) then
-          begin
-            Line:= 'create ';
-            if FieldByName('RDB$Unique_Flag').AsString = '1' then
-              Line:= Line + 'Unique ';
-            if FieldByName('RDB$Index_Type').AsString = '1' then
-              Line:= Line + 'Descending ';
+          if fmMain.GetIndices(ATableName, sqQuery) then
+            with sqQuery do
+              while not EOF do
+              begin
+                if PKIndexName <> Trim(FieldByName('RDB$Index_name').AsString) then
+                begin
+                  Line := 'create ';
+                  if FieldByName('RDB$Unique_Flag').AsString = '1' then
+                    Line := Line + 'Unique ';
+                  if FieldByName('RDB$Index_Type').AsString = '1' then
+                    Line := Line + 'Descending ';
 
-            Line:= Line + 'index ' + Trim(FieldByName('RDB$Index_name').AsString) + ' on ' + ATableName;
+                  Line := Line + 'index ' + Trim(FieldByName('RDB$Index_name').AsString) +
+                    ' on ' + ATableName;
 
-            GetIndexFields(ATableName, Trim(FieldByName('RDB$Index_Name').AsString), fmMain.SQLQuery1, List);
+                  GetIndexFields(ATableName, Trim(FieldByName('RDB$Index_Name').AsString),
+                    fmMain.SQLQuery1, List);
 
-            Line:= Line + ' (' + List.CommaText + ') ;';
-            QWindow.meQuery.Lines.Add(Line);
-          end;
-          Next;
-        end;
+                  Line := Line + ' (' + List.CommaText + ') ;';
+                  QWindow.meQuery.Lines.Add(Line);
+                end;
+                Next;
+              end;
 
         QWindow.meQuery.Lines.Add('');
         SQLQuery1.Close;
@@ -2115,39 +2172,40 @@ begin
 
         // Script triggers
         SQLQuery1.Close;
-        SQLQuery1.SQL.Text:= 'SELECT RDB$Trigger_Name, RDB$Trigger_Inactive FROM RDB$TRIGGERS WHERE RDB$SYSTEM_FLAG=0 ' +
-          'and RDB$Relation_Name = ' + QuotedStr(aTableName);
+        SQLQuery1.SQL.Text :=
+          'SELECT RDB$Trigger_Name, RDB$Trigger_Inactive FROM RDB$TRIGGERS WHERE RDB$SYSTEM_FLAG=0 '
+          + 'and RDB$Relation_Name = ' + QuotedStr(aTableName);
         SQLQuery1.Open;
-        Triggers:= TStringList.Create;
+        Triggers := TStringList.Create;
         try
           with SQLQuery1 do
-          while not EOF do
-          begin
-            Triggers.Add(Trim(Fields[0].AsString));
-            Next;
-          end;
+            while not EOF do
+            begin
+              Triggers.Add(Trim(Fields[0].AsString));
+              Next;
+            end;
           SQLQuery1.Close;
-          for j:= 0 to Triggers.Count - 1 do
+          for j := 0 to Triggers.Count - 1 do
           begin
             List.Clear;
             dmSysTables.ScriptTrigger(dbIndex, Triggers[j], List, True);
 
             // Search for generators
-            Line:= '';
-            for i:= 0 to List.Count - 1 do
+            Line := '';
+            for i := 0 to List.Count - 1 do
               if Pos('gen_id', LowerCase(List[i])) > 0 then
               begin
-                Line:= Copy(List[i], Pos('gen_id', LowerCase(List[i])), Length(List[i]));
+                Line := Copy(List[i], Pos('gen_id', LowerCase(List[i])), Length(List[i]));
                 System.Delete(Line, 1, Pos('(', Line));
-                Line:= Trim(Copy(Line, 1, Pos(', ', Line) - 1));
+                Line := Trim(Copy(Line, 1, Pos(', ', Line) - 1));
               end;
 
-             // Script Generator
-             if Trim(Line) <> '' then
-             begin
-               QWindow.meQuery.Lines.Add('Create Generator ' + Line + ';');
-               QWindow.meQuery.Lines.Add('');
-             end;
+            // Script Generator
+            if Trim(Line) <> '' then
+            begin
+              QWindow.meQuery.Lines.Add('Create Generator ' + Line + ';');
+              QWindow.meQuery.Lines.Add('');
+            end;
 
             QWindow.meQuery.Lines.AddStrings(List);
           end;
@@ -2158,17 +2216,18 @@ begin
         QWindow.meQuery.Lines.Add('');
 
         // Script permissions
-        List.CommaText:= dmSysTables.GetDBUsers(dbIndex);
+        List.CommaText := dmSysTables.GetDBUsers(dbIndex);
 
 
-        for i:= 0 to List.Count - 1 do
+        for i := 0 to List.Count - 1 do
         begin
           if Pos('<R>', List[i]) = 1 then
-            UserName:= Copy(List[i], 4, Length(List[i]) - 3)
+            UserName := Copy(List[i], 4, Length(List[i]) - 3)
           else
-            UserName:= List[i];
+            UserName := List[i];
 
-          ScriptObjectPermission(dbIndex, '<T>' + ATableName, UserName, ObjType, QWindow.meQuery.Lines);
+          ScriptObjectPermission(dbIndex, '<T>' + ATableName, UserName,
+            ObjType, QWindow.meQuery.Lines);
         end;
       finally
         List.Free;
@@ -2187,62 +2246,64 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
   ATableName: string;
-  i: Integer;
+  i: integer;
   PKFieldsList: TStringList;
   FieldLine: string;
   ParamAndValue: string;
   AFieldName: string;
   WhereClause: string;
-  Skipped: Boolean;
+  Skipped: boolean;
   PKIndexName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
   ConstraintName: string;
   LastParam: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATableName:= SelNode.Text;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    QWindow:= ShowQueryWindow(dbIndex, 'Script Table as update: ' + ATableName);
+    ATableName := SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    QWindow := ShowQueryWindow(dbIndex, 'Script Table as update: ' + ATableName);
     GetFields(dbIndex, ATableName, nil);
     QWindow.meQuery.Lines.Clear;
     QWindow.meQuery.Lines.Add('create procedure Update' + ATableName + ' (');
 
     // Params
-    ParamAndValue:= '';
+    ParamAndValue := '';
     with SQLQuery1 do
-    while not EOF do
-    begin
-      Skipped:= False;
-      if (FieldByName('computed_source').AsString = '') then
+      while not EOF do
       begin
-        AFieldName:= Trim(SQLQuery1.FieldByName('Field_Name').AsString);
-        ParamAndValue:= ParamAndValue + AFieldName + ' = :' + AFieldName;
-        FieldLine:= AFieldName + ' ';
-        FieldLine:= FieldLine + GetFBTypeName(SQLQuery1.FieldByName('field_type_int').AsInteger,
-          SQLQuery1.FieldByName('field_sub_type').AsInteger,
-          SQLQuery1.FieldByName('field_length').AsInteger,
-          SQLQuery1.FieldByName('field_precision').AsInteger,
-          SQLQuery1.FieldByName('field_scale').AsInteger);
-        if FieldByName('field_type_int').AsInteger in [CStringType,CharType,VarCharType] then
-          FieldLine:= FieldLine + '(' + FieldByName('CharacterLength').AsString + ') ';
-      end
-      else
-        Skipped:= True;
-      Next;
-
-      if not Skipped then
-      begin
-        if not EOF then
+        Skipped := False;
+        if (FieldByName('computed_source').AsString = '') then
         begin
-          FieldLine:= FieldLine + ',';
-          ParamAndValue:= ParamAndValue + ', ';
-        end;
-        QWindow.meQuery.Lines.Add(FieldLine);
+          AFieldName := Trim(SQLQuery1.FieldByName('Field_Name').AsString);
+          ParamAndValue := ParamAndValue + AFieldName + ' = :' + AFieldName;
+          FieldLine := AFieldName + ' ';
+          FieldLine := FieldLine +
+            GetFBTypeName(SQLQuery1.FieldByName('field_type_int').AsInteger,
+            SQLQuery1.FieldByName('field_sub_type').AsInteger,
+            SQLQuery1.FieldByName('field_length').AsInteger,
+            SQLQuery1.FieldByName('field_precision').AsInteger,
+            SQLQuery1.FieldByName('field_scale').AsInteger);
+          if FieldByName('field_type_int').AsInteger in
+            [CStringType, CharType, VarCharType] then
+            FieldLine := FieldLine + '(' + FieldByName('CharacterLength').AsString + ') ';
+        end
+        else
+          Skipped := True;
+        Next;
 
+        if not Skipped then
+        begin
+          if not EOF then
+          begin
+            FieldLine := FieldLine + ',';
+            ParamAndValue := ParamAndValue + ', ';
+          end;
+          QWindow.meQuery.Lines.Add(FieldLine);
+
+        end;
       end;
-    end;
 
     // Remote last , if any
     if RightStr(ParamAndValue, 2) = ', ' then
@@ -2250,26 +2311,26 @@ begin
     SQLQuery1.Close;
 
     // Primary Keys
-    WhereClause:= '';
-    PKFieldsList:= TStringList.Create;
-    PKIndexName:= GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
+    WhereClause := '';
+    PKFieldsList := TStringList.Create;
+    PKIndexName := GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
     if PKIndexName <> '' then
     begin
       GetConstraintFields(ATableName, PKIndexName, PKFieldsList);
-      for i:= 0 to PKFieldsList.Count - 1 do
+      for i := 0 to PKFieldsList.Count - 1 do
       begin
-        WhereClause:= WhereClause + PKFieldsList[i] + ' = :' + PKFieldsList[i];
+        WhereClause := WhereClause + PKFieldsList[i] + ' = :' + PKFieldsList[i];
         if i < PKFieldsList.Count - 1 then
-          WhereClause:= WhereClause + ' and ';
+          WhereClause := WhereClause + ' and ';
       end;
     end;
 
     // Remove last , if any
-    LastParam:= QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1];
+    LastParam := QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1];
     if Pos(',', LastParam) > 0 then
     begin
-      LastParam:= StringReplace(LastParam, ',', '', []);
-      QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1]:= LastParam;
+      LastParam := StringReplace(LastParam, ',', '', []);
+      QWindow.meQuery.Lines[QWindow.meQuery.Lines.Count - 1] := LastParam;
     end;
 
     QWindow.meQuery.Lines.Add(')');
@@ -2293,24 +2354,25 @@ var
   Rec: TDatabaseRec;
   AGenName: string;
   OrigValue: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    Rec:= RegisteredDatabases[dbIndex];
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    Rec := RegisteredDatabases[dbIndex];
     SetConnection(dbIndex);
 
-    AGenName:= SelNode.Text;
+    AGenName := SelNode.Text;
     SQLQuery1.Close;
-    SQLQuery1.SQL.Text:= 'select GEN_ID(' + AGenName + ', 0) from RDB$Database;';
+    SQLQuery1.SQL.Text := 'select GEN_ID(' + AGenName + ', 0) from RDB$Database;';
 
     SQLQuery1.Open;
-    OrigValue:= SQLQuery1.Fields[0].AsString;
+    OrigValue := SQLQuery1.Fields[0].AsString;
     SQLQuery1.Close;
 
-    ShowCompleteQueryWindow(dbIndex, 'set generator value', 'set generator ' + AGenName + ' to ' + OrigValue);
+    ShowCompleteQueryWindow(dbIndex, 'set generator value', 'set generator ' +
+      AGenName + ' to ' + OrigValue);
   end;
 
 end;
@@ -2320,23 +2382,23 @@ end;
 procedure TfmMain.lmSweepClick(Sender: TObject);
 var
   FireBirdServices: TFirebirdServices;
-  dbIndex: Integer;
+  dbIndex: integer;
   AdbName: string;
   Lines: string;
   s: string;
 begin
-  dbIndex:= PtrInt(tvMain.Selected.Data);
-  FireBirdServices:= TFirebirdServices.Create;
-  Screen.Cursor:= crSQLWait;
+  dbIndex := PtrInt(tvMain.Selected.Data);
+  FireBirdServices := TFirebirdServices.Create;
+  Screen.Cursor := crSQLWait;
   try
-    FireBirdServices.VerboseOutput:= True;
+    FireBirdServices.VerboseOutput := True;
     with FireBirdServices, RegisteredDatabases[dbIndex] do
     begin
-      HostName:= GetServerName(RegRec.DatabaseName);
-      AdbName:= RegRec.DatabaseName;
+      HostName := GetServerName(RegRec.DatabaseName);
+      AdbName := RegRec.DatabaseName;
       if Pos(':', AdbName) > 2 then
         Delete(AdbName, 1, Pos(':', AdbName));
-      DBName:= AdbName;
+      DBName := AdbName;
       UserName := RegRec.UserName;
       Password := RegRec.Password;
 
@@ -2344,8 +2406,8 @@ begin
         AttachService;
         StartSweep;
         while ServiceQuery(S) do
-          Lines:= Lines + S;
-        Screen.Cursor:= crDefault;
+          Lines := Lines + S;
+        Screen.Cursor := crDefault;
         ShowMessage('Sweep database: ' + AdbName + ' completed');
       except
         on E: Exception do
@@ -2356,7 +2418,7 @@ begin
       DetachService;
     end;
   finally
-    Screen.Cursor:= crDefault;
+    Screen.Cursor := crDefault;
     FireBirdServices.Free;
   end;
 end;
@@ -2367,38 +2429,39 @@ end;
 procedure TfmMain.lmTableManageClick(Sender: TObject);
 var
   SelNode: TTreeNode;
-  dbIndex: Integer;
+  dbIndex: integer;
   fmTableManage: TfmTableManage;
   ATab: TTabSheet;
   Title: string;
 begin
   try
-    SelNode:= tvMain.Selected;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
+    SelNode := tvMain.Selected;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
 
-    Title:= RegisteredDatabases[dbIndex].RegRec.Title +  ': Management of : ' + SelNode.Text;
+    Title := RegisteredDatabases[dbIndex].RegRec.Title + ': Management of : ' +
+      SelNode.Text;
     // Fields
-    fmTableManage:= FindCustomForm(Title, TfmTableManage) as TfmTableManage;
+    fmTableManage := FindCustomForm(Title, TfmTableManage) as TfmTableManage;
     if fmTableManage = nil then
     begin
-      fmTableManage:= TfmTableManage.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      fmTableManage.Parent:= ATab;
-      fmTableManage.Left:= 0;
-      fmTableManage.Top:= 0;
-      fmTableManage.Align:= alClient;
-      fmTableManage.BorderStyle:= bsNone;
+      fmTableManage := TfmTableManage.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      fmTableManage.Parent := ATab;
+      fmTableManage.Left := 0;
+      fmTableManage.Top := 0;
+      fmTableManage.Align := alClient;
+      fmTableManage.BorderStyle := bsNone;
     end
     else
-      ATab:= fmTableManage.Parent as TTabSheet;
+      ATab := fmTableManage.Parent as TTabSheet;
 
-    PageControl1.ActivePage:= ATab;
-    fmTableManage.Caption:= Title;
-    ATab.Caption:= Title;
-    ATab.Tag:= dbIndex;
+    PageControl1.ActivePage := ATab;
+    fmTableManage.Caption := Title;
+    ATab.Caption := Title;
+    ATab.Tag := dbIndex;
     fmTableManage.Init(dbIndex, SelNode.Text);
-    fmTableManage.PageControl1.TabIndex:= 0;
+    fmTableManage.PageControl1.TabIndex := 0;
 
     // Fields
     ViewTableFields(SelNode.Text, dbIndex, fmTableManage.sgFields);
@@ -2419,7 +2482,8 @@ begin
     fmTableManage.Show;
   except
     on E: Exception do
-      MessageDlg('Error while opening Table Management: ' + e.Message, mtError, [mbOk], 0);
+      MessageDlg('Error while opening Table Management: ' + e.Message,
+        mtError, [mbOK], 0);
   end;
 end;
 
@@ -2438,56 +2502,56 @@ var
   CharacterSet: string;
   Collation: string;
   DomainType: string;
-  DomainSize: Integer;
+  DomainSize: integer;
   ADomainForm: TFmViewDomain;
   DefaultValue: string;
   ATab: TTabSheet;
-  dbIndex: Integer;
+  dbIndex: integer;
   Title: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ADomainName:= SelNode.Text;
-    Title:= SelNode.Parent.Parent.Text + ': Domain: ' + ADomainName;
-    ADomainForm:= TfmViewDomain(FindCustomForm(Title, TfmViewDomain));
-    if ADomainForm  = nil then
+    ADomainName := SelNode.Text;
+    Title := SelNode.Parent.Parent.Text + ': Domain: ' + ADomainName;
+    ADomainForm := TfmViewDomain(FindCustomForm(Title, TfmViewDomain));
+    if ADomainForm = nil then
     begin
-      ADomainForm:= TfmViewDomain.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      ADomainForm.Parent:= ATab;
-      ADomainForm.Left:= 0;
-      ADomainForm.Top:= 0;
-      ADomainForm.BorderStyle:= bsNone;
-      ADomainForm.Align:= alClient;
-      PageControl1.ActivePage:= ATab;
+      ADomainForm := TfmViewDomain.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      ADomainForm.Parent := ATab;
+      ADomainForm.Left := 0;
+      ADomainForm.Top := 0;
+      ADomainForm.BorderStyle := bsNone;
+      ADomainForm.Align := alClient;
+      PageControl1.ActivePage := ATab;
     end
     else
-      ATab:= ADomainForm.Parent as TTabSheet;
-    PageControl1.ActivePage:= ATab;
+      ATab := ADomainForm.Parent as TTabSheet;
+    PageControl1.ActivePage := ATab;
 
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    dmSysTables.GetDomainInfo(dbIndex, ADomainName, DomainType, DomainSize, DefaultValue, CheckConstraint, CharacterSet, Collation);
-    ATab.Tag:= dbIndex;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    dmSysTables.GetDomainInfo(dbIndex, ADomainName, DomainType, DomainSize,
+      DefaultValue, CheckConstraint, CharacterSet, Collation);
+    ATab.Tag := dbIndex;
     if Pos('default', LowerCase(DefaultValue)) = 1 then
-      DefaultValue:= Trim(Copy(DefaultValue, 8, Length(DefaultValue)));
-    if (Pos('CHAR', DomainType) > 0) or
-      (Pos('CSTRING', DomainType) >0) then
-      DomainType:= DomainType + '(' + IntToStr(DomainSize) + ')';
+      DefaultValue := Trim(Copy(DefaultValue, 8, Length(DefaultValue)));
+    if (Pos('CHAR', DomainType) > 0) or (Pos('CSTRING', DomainType) > 0) then
+      DomainType := DomainType + '(' + IntToStr(DomainSize) + ')';
 
     // Fill ViewDomain form
     with ADomainForm do
     begin
-      Caption:= Title;
-      ATab.Caption:= Caption;
-      edName.Caption:= ADomainName;
-      laType.Caption:= DomainType;
-      laSize.Caption:= IntToStr(DomainSize);
-      laDefault.Caption:= DefaultValue;
-      laCheckConstraint.Caption:= CheckConstraint;
-      laCharacterSet.Caption:= CharacterSet;
-      laCollation.Caption:= Collation;
+      Caption := Title;
+      ATab.Caption := Caption;
+      edName.Caption := ADomainName;
+      laType.Caption := DomainType;
+      laSize.Caption := IntToStr(DomainSize);
+      laDefault.Caption := DefaultValue;
+      laCheckConstraint.Caption := CheckConstraint;
+      laCharacterSet.Caption := CharacterSet;
+      laCollation.Caption := Collation;
     end;
     ADomainForm.Show;
   end;
@@ -2496,30 +2560,31 @@ end;
 
 (********************  Get Fields  **************************)
 
-procedure TfmMain.GetFields(DatabaseIndex: Integer; ATableName: string; FieldsList: TStringList);
+procedure TfmMain.GetFields(DatabaseIndex: integer; ATableName: string;
+  FieldsList: TStringList);
 const
-  QueryTemplate= 'SELECT r.RDB$FIELD_NAME AS field_name, ' +
+  QueryTemplate = 'SELECT r.RDB$FIELD_NAME AS field_name, ' +
     ' r.RDB$DESCRIPTION AS field_description, ' +
-    ' r.RDB$DEFAULT_SOURCE AS field_default_source, ' {SQL source for default value }+
+    ' r.RDB$DEFAULT_SOURCE AS field_default_source, ' {SQL source for default value } +
     ' r.RDB$NULL_FLAG AS field_not_null_constraint, ' +
     ' f.RDB$FIELD_LENGTH AS field_length, ' +
-    ' f.RDB$CHARACTER_LENGTH AS characterlength, ' + {character_length seems a reserved word}
+    ' f.RDB$CHARACTER_LENGTH AS characterlength, ' +
+    {character_length seems a reserved word}
     ' f.RDB$FIELD_PRECISION AS field_precision, ' +
-    ' f.RDB$FIELD_SCALE AS field_scale, ' +
-    ' f.RDB$FIELD_TYPE as field_type_int, ' +
+    ' f.RDB$FIELD_SCALE AS field_scale, ' + ' f.RDB$FIELD_TYPE as field_type_int, ' +
     ' f.RDB$FIELD_SUB_TYPE AS field_sub_type, ' +
     ' coll.RDB$COLLATION_NAME AS field_collation, ' +
     ' cset.RDB$CHARACTER_SET_NAME AS field_charset, ' +
     ' f.RDB$computed_source AS computed_source, ' +
     ' dim.RDB$UPPER_BOUND AS array_upper_bound, ' +
-    ' r.RDB$FIELD_SOURCE AS field_source ' {domain if field based on domain}+
+    ' r.RDB$FIELD_SOURCE AS field_source ' {domain if field based on domain} +
     ' FROM RDB$RELATION_FIELDS r ' +
     ' LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME ' +
-    ' LEFT JOIN RDB$COLLATIONS coll ON f.RDB$COLLATION_ID = coll.RDB$COLLATION_ID and f.rdb$character_set_id=coll.rdb$character_set_id ' +
-    ' LEFT JOIN RDB$CHARACTER_SETS cset ON f.RDB$CHARACTER_SET_ID = cset.RDB$CHARACTER_SET_ID ' +
-    ' LEFT JOIN RDB$FIELD_DIMENSIONS dim ON f.RDB$FIELD_NAME = dim.RDB$FIELD_NAME ' +
-    ' WHERE r.RDB$RELATION_NAME=''%s'' ' +
-    ' ORDER BY r.RDB$FIELD_POSITION;';
+    ' LEFT JOIN RDB$COLLATIONS coll ON f.RDB$COLLATION_ID = coll.RDB$COLLATION_ID and f.rdb$character_set_id=coll.rdb$character_set_id '
+    +
+    ' LEFT JOIN RDB$CHARACTER_SETS cset ON f.RDB$CHARACTER_SET_ID = cset.RDB$CHARACTER_SET_ID '
+    + ' LEFT JOIN RDB$FIELD_DIMENSIONS dim ON f.RDB$FIELD_NAME = dim.RDB$FIELD_NAME ' +
+    ' WHERE r.RDB$RELATION_NAME=''%s'' ' + ' ORDER BY r.RDB$FIELD_POSITION;';
 var
   Rec: TDatabaseRec;
   FieldName: string;
@@ -2529,12 +2594,12 @@ begin
   before changing the query's transaction}
   if (Assigned(FSQLTransaction)) then
     FSQLTransaction.Commit;
-  Rec:= RegisteredDatabases[DatabaseIndex];
+  Rec := RegisteredDatabases[DatabaseIndex];
   SetConnection(DatabaseIndex);
-  SQLQuery1.SQL.Text:= format(QueryTemplate,[ATableName]);
+  SQLQuery1.SQL.Text := format(QueryTemplate, [ATableName]);
   {$IFDEF NEVER}
   // Left for debugging
-  SendDebug('GetFields: '+SQLQuery1.SQL.Text);
+  SendDebug('GetFields: ' + SQLQuery1.SQL.Text);
   {$ENDIF}
   SQLQuery1.Open;
   // If FieldsList is nil, don't try to fill results. Calling code probably
@@ -2544,7 +2609,7 @@ begin
     FieldsList.Clear;
     while not SQLQuery1.EOF do
     begin
-      FieldName:= Trim(SQLQuery1.FieldByName('field_name').AsString);
+      FieldName := Trim(SQLQuery1.FieldByName('field_name').AsString);
       // Avoid duplicate field names
       if FieldsList.IndexOf(FieldName) = -1 then
         FieldsList.Add(FieldName);
@@ -2556,23 +2621,22 @@ end;
 
 (**********  Get Stored Proc body  ****************)
 
-function TfmMain.GetStoredProcBody(DatabaseIndex: Integer; AProcName: string; var SPOwner: string): string;
+function TfmMain.GetStoredProcBody(DatabaseIndex: integer; AProcName: string;
+  var SPOwner: string): string;
 const
-  BodyTemplate=
+  BodyTemplate =
     'SELECT * FROM rdb$procedures where rdb$Procedure_name =  ''%s'' ';
-  ParamTemplate=
-   'SELECT rdb$parameter_name, rdb$field_type, rdb$field_sub_type, '+
-   'rdb$field_length, rdb$field_scale, rdb$field_precision, '+
-   'rdb$character_length, rdb$parameter_type '+
-   'FROM rdb$procedure_parameters sp_param '+
-   'JOIN rdb$fields fld '+
-   'ON sp_param.rdb$field_source = fld.rdb$field_name '+
-   'WHERE '+
-   'sp_param.rdb$procedure_name =''%s'' ' +
-   'order by rdb$parameter_type, rdb$parameter_number';
+  ParamTemplate =
+    'SELECT rdb$parameter_name, rdb$field_type, rdb$field_sub_type, ' +
+    'rdb$field_length, rdb$field_scale, rdb$field_precision, ' +
+    'rdb$character_length, rdb$parameter_type ' +
+    'FROM rdb$procedure_parameters sp_param ' + 'JOIN rdb$fields fld ' +
+    'ON sp_param.rdb$field_source = fld.rdb$field_name ' + 'WHERE ' +
+    'sp_param.rdb$procedure_name =''%s'' ' +
+    'order by rdb$parameter_type, rdb$parameter_number';
 var
   Rec: TDatabaseRec;
-  i: Integer;
+  i: integer;
   InputParams: integer; //count of input parameters
   Line: string;
   ParamName: string;
@@ -2580,47 +2644,49 @@ var
   BodyList: TStringList; // procedure body
 begin
   try
-    AProcName:= UpperCase(AProcName);
-    BodyList:= TStringList.Create;
+    AProcName := UpperCase(AProcName);
+    BodyList := TStringList.Create;
     try
-      Rec:= RegisteredDatabases[DatabaseIndex];
+      Rec := RegisteredDatabases[DatabaseIndex];
       SetConnection(DatabaseIndex);
 
       // Get number of input and output parameters
       SQLQuery1.Close;
-      SQLQuery1.SQL.Text:= format(BodyTemplate,[AProcName]);
+      SQLQuery1.SQL.Text := format(BodyTemplate, [AProcName]);
       SQLQuery1.Open;
       // Null will result in 0 which is fine here
-      InputParams:= SQLQuery1.FieldByName('rdb$procedure_inputs').AsInteger;
-      OutputParams:= SQLQuery1.FieldByName('rdb$procedure_outputs').AsInteger;
+      InputParams := SQLQuery1.FieldByName('rdb$procedure_inputs').AsInteger;
+      OutputParams := SQLQuery1.FieldByName('rdb$procedure_outputs').AsInteger;
 
       SQLQuery1.Close;
-      SQLQuery1.SQL.Text:= format(ParamTemplate,[AProcName]);
+      SQLQuery1.SQL.Text := format(ParamTemplate, [AProcName]);
       SQLQuery1.Open;
 
       // Get input parameters
-      if InputParams>0 then
+      if InputParams > 0 then
       begin
         BodyList.Add('(');
-        i:= 1;
-        while (not SQLQuery1.EOF) and (i<=InputParams) do
+        i := 1;
+        while (not SQLQuery1.EOF) and (i <= InputParams) do
         begin
           // Check for input parameter type:
-          if (SQLQuery1.FieldByName('rdb$parameter_type').AsInteger=0) then
+          if (SQLQuery1.FieldByName('rdb$parameter_type').AsInteger = 0) then
           begin
-            ParamName:= Trim(SQLQuery1.FieldByName('rdb$parameter_name').AsString);
-            Line:= '  ' + ParamName + '    ' +
+            ParamName := Trim(SQLQuery1.FieldByName('rdb$parameter_name').AsString);
+            Line := '  ' + ParamName + '    ' +
               GetFBTypeName(SQLQuery1.FieldByName('RDB$Field_Type').AsInteger,
               SQLQuery1.FieldByName('rdb$field_sub_type').AsInteger,
               SQLQuery1.FieldByName('rdb$field_length').AsInteger,
               SQLQuery1.FieldByName('rdb$field_precision').AsInteger,
               SQLQuery1.FieldByName('rdb$field_scale').AsInteger);
-            if SQLQuery1.FieldByName('RDB$Field_Type').AsInteger in [CharType,CStringType,VarCharType] then
-              Line:= Line + '(' + SQLQuery1.FieldByName('RDB$Character_Length').AsString + ')';
-            if (InputParams>1) and (i<InputParams) then
-              Line:= Line + ',';
+            if SQLQuery1.FieldByName('RDB$Field_Type').AsInteger in
+              [CharType, CStringType, VarCharType] then
+              Line := Line + '(' + SQLQuery1.FieldByName(
+                'RDB$Character_Length').AsString + ')';
+            if (InputParams > 1) and (i < InputParams) then
+              Line := Line + ',';
             BodyList.Add(Line);
-            inc(i);
+            Inc(i);
           end;
           SQLQuery1.Next;
         end;
@@ -2628,28 +2694,30 @@ begin
       end;
 
       // Get output parameters
-      if OutputParams>0 then
+      if OutputParams > 0 then
       begin
         BodyList.Add('RETURNS (');
-        i:= 1;
-        while (not SQLQuery1.EOF) and (i<=OutputParams) do
+        i := 1;
+        while (not SQLQuery1.EOF) and (i <= OutputParams) do
         begin
           // Check for input parameter type:
-          if (SQLQuery1.FieldByName('rdb$parameter_type').AsInteger=1) then
+          if (SQLQuery1.FieldByName('rdb$parameter_type').AsInteger = 1) then
           begin
-            ParamName:= Trim(SQLQuery1.FieldByName('rdb$parameter_name').AsString);
-            Line:= '  ' + ParamName + '    ' +
+            ParamName := Trim(SQLQuery1.FieldByName('rdb$parameter_name').AsString);
+            Line := '  ' + ParamName + '    ' +
               GetFBTypeName(SQLQuery1.FieldByName('RDB$Field_Type').AsInteger,
               SQLQuery1.FieldByName('rdb$field_sub_type').AsInteger,
               SQLQuery1.FieldByName('rdb$field_length').AsInteger,
               SQLQuery1.FieldByName('rdb$field_precision').AsInteger,
               SQLQuery1.FieldByName('rdb$field_scale').AsInteger);
-            if SQLQuery1.FieldByName('RDB$Field_Type').AsInteger in [CharType,CStringType,VarCharType] then
-              Line:= Line + '(' + SQLQuery1.FieldByName('RDB$Character_Length').AsString + ')';
-            if (OutputParams>1) and (i<OutputParams) then
-              Line:= Line + ',';
+            if SQLQuery1.FieldByName('RDB$Field_Type').AsInteger in
+              [CharType, CStringType, VarCharType] then
+              Line := Line + '(' + SQLQuery1.FieldByName(
+                'RDB$Character_Length').AsString + ')';
+            if (OutputParams > 1) and (i < OutputParams) then
+              Line := Line + ',';
             BodyList.Add(Line);
-            inc(i);
+            Inc(i);
           end;
           SQLQuery1.Next;
         end;
@@ -2660,97 +2728,93 @@ begin
       BodyList.Add('AS');
 
       // Get Procedure body (using the same query as before)
-      SQLQuery1.SQL.Text:= format(BodyTemplate,[AProcName]);
+      SQLQuery1.SQL.Text := format(BodyTemplate, [AProcName]);
       SQLQuery1.Open;
-      SPOwner:= Trim(SQLQuery1.FieldByName('rdb$Owner_Name').AsString);
+      SPOwner := Trim(SQLQuery1.FieldByName('rdb$Owner_Name').AsString);
       // Actual body text:
       BodyList.Add(SQLQuery1.FieldByName('rdb$Procedure_Source').AsString);
       SQLQuery1.Close;
-      Result:= BodyList.Text;
+      Result := BodyList.Text;
     finally
       BodyList.Free;
     end;
   except
     on E: Exception do
-      MessageDlg('Error while getting stored procedure information: ' + e.Message, mtError, [mbOk], 0);
+      MessageDlg('Error while getting stored procedure information: ' +
+        e.Message, mtError, [mbOK], 0);
   end;
 end;
 
 (******************  Get View Info (SQL Source) ***************)
 
-function TfmMain.GetViewInfo(DatabaseIndex: Integer; AViewName: string; var Columns, Body: string): Boolean;
+function TfmMain.GetViewInfo(DatabaseIndex: integer; AViewName: string;
+  var Columns, Body: string): boolean;
 const
-  BodyTemplate= 'SELECT RDB$VIEW_SOURCE ' +
-    ' FROM RDB$RELATIONS ' +
-    ' WHERE RDB$VIEW_SOURCE IS NOT NULL ' +
-    ' AND UPPER(RDB$RELATION_NAME) = ''%s'';';
-  ColumnsTemplate= 'select r.rdb$field_name '+
-    ' from rdb$relation_fields r ' +
-    ' inner join rdb$fields f on ' +
-    ' r.rdb$field_source=f.rdb$field_name ' +
-    ' inner join rdb$types t on ' +
-    ' f.rdb$field_type=t.rdb$type ' +
+  BodyTemplate = 'SELECT RDB$VIEW_SOURCE ' + ' FROM RDB$RELATIONS ' +
+    ' WHERE RDB$VIEW_SOURCE IS NOT NULL ' + ' AND UPPER(RDB$RELATION_NAME) = ''%s'';';
+  ColumnsTemplate = 'select r.rdb$field_name ' + ' from rdb$relation_fields r ' +
+    ' inner join rdb$fields f on ' + ' r.rdb$field_source=f.rdb$field_name ' +
+    ' inner join rdb$types t on ' + ' f.rdb$field_type=t.rdb$type ' +
     ' where upper(r.rdb$relation_name)=''%s'' and ' +
-    ' t.rdb$field_name=''RDB$FIELD_TYPE'' ' +
-    ' order by r.RDB$FIELD_POSITION ';
+    ' t.rdb$field_name=''RDB$FIELD_TYPE'' ' + ' order by r.RDB$FIELD_POSITION ';
 var
   Rec: TDatabaseRec;
 begin
-  Rec:= RegisteredDatabases[DatabaseIndex];
+  Rec := RegisteredDatabases[DatabaseIndex];
   SetConnection(DatabaseIndex);
 
   // View Body
   SQLQuery1.Close;
-  SQLQuery1.SQL.Text:= format(BodyTemplate, [UpperCase(AViewName)]);
+  SQLQuery1.SQL.Text := format(BodyTemplate, [UpperCase(AViewName)]);
 
   SQLQuery1.Open;
-  Body:= SQLQuery1.Fields[0].AsString;
+  Body := SQLQuery1.Fields[0].AsString;
 
   // View Columns
   SQLQuery1.Close;
-  SQLQuery1.SQL.Text:= format(ColumnsTemplate, [UpperCase(AViewName)]);
-  Columns:= '';
+  SQLQuery1.SQL.Text := format(ColumnsTemplate, [UpperCase(AViewName)]);
+  Columns := '';
   SQLQuery1.Open;
   while not SQLQuery1.EOF do
   begin
-    Columns:= Columns + Trim(SQLQuery1.FieldByName('rdb$field_name').AsString);
+    Columns := Columns + Trim(SQLQuery1.FieldByName('rdb$field_name').AsString);
     SQLQuery1.Next;
     if not SQLQuery1.EOF then
-      Columns:= Columns + ', ';
+      Columns := Columns + ', ';
   end;
   SQLQuery1.Close;
-  Result:= True;
+  Result := True;
 end;
 
 
 (************  Change Trigger activity  *************)
 
-function TfmMain.ChangeTriggerActivity(DatabaseIndex: Integer;
-  ATriggerName: string; ActiveState: Boolean): Boolean;
+function TfmMain.ChangeTriggerActivity(DatabaseIndex: integer;
+  ATriggerName: string; ActiveState: boolean): boolean;
 var
   Rec: TDatabaseRec;
   ActiveStr: string;
 begin
   try
-    Rec:= RegisteredDatabases[DatabaseIndex];
+    Rec := RegisteredDatabases[DatabaseIndex];
     SetConnection(DatabaseIndex);
 
     SQLQuery1.Close;
     if ActiveState then
-      ActiveStr:= 'Active'
+      ActiveStr := 'Active'
     else
-      ActiveStr:= 'InActive';
-    SQLQuery1.SQL.Text:= 'alter trigger '+ ATriggerName + ' ' + ActiveStr;
+      ActiveStr := 'InActive';
+    SQLQuery1.SQL.Text := 'alter trigger ' + ATriggerName + ' ' + ActiveStr;
 
     SQLQuery1.ExecSQL;
-    Result:= True;
+    Result := True;
     FSQLTransaction.Commit;
     AddToSQLHistory(Rec.RegRec.Title, 'DDL', SQLQuery1.SQL.Text);
   except
     on E: Exception do
     begin
       ShowMessage('Error: ' + e.Message);
-      Result:= False;
+      Result := False;
     end;
   end;
 end;
@@ -2758,139 +2822,150 @@ end;
 (***************  Get Index fields  *******************)
 
 function TfmMain.GetIndexFields(ATableName, AIndexName: string;
-  AQuery: TSQLQuery; var FieldsList: TStringList): Boolean;
+  AQuery: TSQLQuery; var FieldsList: TStringList): boolean;
 begin
   AQuery.Close;
-  AQuery.SQL.Text:= 'SELECT RDB$INDEX_SEGMENTS.RDB$FIELD_NAME AS field_name, ' + LineEnding +
-     'RDB$INDICES.RDB$DESCRIPTION AS description, ' +LineEnding +
-     '(RDB$INDEX_SEGMENTS.RDB$FIELD_POSITION + 1) AS field_position ' +LineEnding +
-     'FROM RDB$INDEX_SEGMENTS ' +LineEnding +
-     'LEFT JOIN RDB$INDICES ON RDB$INDICES.RDB$INDEX_NAME = RDB$INDEX_SEGMENTS.RDB$INDEX_NAME ' +LineEnding +
-     'LEFT JOIN RDB$RELATION_CONSTRAINTS ON RDB$RELATION_CONSTRAINTS.RDB$INDEX_NAME = RDB$INDEX_SEGMENTS.RDB$INDEX_NAME ' +LineEnding +
-     ' WHERE UPPER(RDB$INDICES.RDB$RELATION_NAME)=''' + UpperCase(ATablename) + '''         -- table name ' +LineEnding +
-     '  AND UPPER(RDB$INDICES.RDB$INDEX_NAME)=''' + UpperCase(AIndexName) + ''' -- index name ' +LineEnding +
-     '--  AND RDB$RELATION_CONSTRAINTS.RDB$CONSTRAINT_TYPE IS NULL ' +LineEnding +
-     'ORDER BY RDB$INDEX_SEGMENTS.RDB$FIELD_POSITION;';
+  AQuery.SQL.Text := 'SELECT RDB$INDEX_SEGMENTS.RDB$FIELD_NAME AS field_name, ' +
+    LineEnding + 'RDB$INDICES.RDB$DESCRIPTION AS description, ' + LineEnding +
+    '(RDB$INDEX_SEGMENTS.RDB$FIELD_POSITION + 1) AS field_position ' + LineEnding +
+    'FROM RDB$INDEX_SEGMENTS ' + LineEnding +
+    'LEFT JOIN RDB$INDICES ON RDB$INDICES.RDB$INDEX_NAME = RDB$INDEX_SEGMENTS.RDB$INDEX_NAME '
+    + LineEnding +
+    'LEFT JOIN RDB$RELATION_CONSTRAINTS ON RDB$RELATION_CONSTRAINTS.RDB$INDEX_NAME = RDB$INDEX_SEGMENTS.RDB$INDEX_NAME '
+    + LineEnding + ' WHERE UPPER(RDB$INDICES.RDB$RELATION_NAME)=''' +
+    UpperCase(ATablename) + '''         -- table name ' + LineEnding +
+    '  AND UPPER(RDB$INDICES.RDB$INDEX_NAME)=''' + UpperCase(AIndexName) +
+    ''' -- index name ' + LineEnding +
+    '--  AND RDB$RELATION_CONSTRAINTS.RDB$CONSTRAINT_TYPE IS NULL ' + LineEnding +
+    'ORDER BY RDB$INDEX_SEGMENTS.RDB$FIELD_POSITION;';
   AQuery.Open;
-  Result:= AQuery.FieldCount > 0;
+  Result := AQuery.FieldCount > 0;
   FieldsList.Clear;
 
   // Get index field names
   if Result then
-  while not AQuery.EOF do
-  begin
-    FieldsList.Add(Trim(AQuery.FieldByName('field_name').AsString));
-    AQuery.Next;
-  end;
+    while not AQuery.EOF do
+    begin
+      FieldsList.Add(Trim(AQuery.FieldByName('field_name').AsString));
+      AQuery.Next;
+    end;
   if not Result then
     AQuery.Close;
 end;
 
 (***********  Get UDF Info  ***************)
 
-function TfmMain.GetUDFInfo(DatabaseIndex: Integer; UDFName: string;
-  var ModuleName, EntryPoint, Params: string): Boolean;
+function TfmMain.GetUDFInfo(DatabaseIndex: integer; UDFName: string;
+  var ModuleName, EntryPoint, Params: string): boolean;
 var
   Rec: TDatabaseRec;
 begin
   try
-    Rec:= RegisteredDatabases[DatabaseIndex];
+    Rec := RegisteredDatabases[DatabaseIndex];
     SetConnection(DatabaseIndex);
 
     SQLQuery1.Close;
-    SQLQuery1.SQL.Text:= Format('SELECT * FROM RDB$FUNCTIONS WHERE RDB$FUNCTION_NAME = ''%s'' ',[UDFName]);
+    SQLQuery1.SQL.Text := Format(
+      'SELECT * FROM RDB$FUNCTIONS WHERE RDB$FUNCTION_NAME = ''%s'' ', [UDFName]);
     SQLQuery1.Open;
-    ModuleName:= Trim(SQLQuery1.FieldByName('RDB$MODULE_NAME').AsString);
-    EntryPoint:= Trim(SQLQuery1.FieldByName('RDB$ENTRYPOINT').AsString);
+    ModuleName := Trim(SQLQuery1.FieldByName('RDB$MODULE_NAME').AsString);
+    EntryPoint := Trim(SQLQuery1.FieldByName('RDB$ENTRYPOINT').AsString);
 
     //todo: (low priority) probably domain based datatypes should be supported for input and output params in UDF declarations
 
     // input Params
     SQLQuery1.Close;
-    SQLQuery1.SQL.Text:= 'SELECT * FROM RDB$FUNCTION_ARGUMENTS WHERE RDB$FUNCTION_Name = ''' +
-     UDFName + ''' and RDB$MECHANISM = 1';
+    SQLQuery1.SQL.Text :=
+      'SELECT * FROM RDB$FUNCTION_ARGUMENTS WHERE RDB$FUNCTION_Name = '''
+      + UDFName + ''' and RDB$MECHANISM = 1';
     SQLQuery1.Open;
-    Params:= '';
+    Params := '';
     while not SQLQuery1.EOF do
     begin
-      Params:= Params + LineEnding + GetFBTypeName(SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger,
+      Params := Params + LineEnding +
+        GetFBTypeName(SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_LENGTH').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_PRECISION').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_SCALE').AsInteger);
-      if SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger in [CharType, CStringType, VarCharType] then
-        Params:= Params + '(' + SQLQuery1.FieldByName('RDB$Character_LENGTH').AsString + ')';
+      if SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger in
+        [CharType, CStringType, VarCharType] then
+        Params := Params + '(' + SQLQuery1.FieldByName(
+          'RDB$Character_LENGTH').AsString + ')';
       SQLQuery1.Next;
       if not SQLQuery1.EOF then
-        Params:= Params + ', ';
+        Params := Params + ', ';
     end;
     SQLQuery1.Close;
-    Params:= Params + ')' + LineEnding + LineEnding + 'Returns ';
+    Params := Params + ')' + LineEnding + LineEnding + 'Returns ';
 
     // Result Params
-    SQLQuery1.SQL.Text:= Format('SELECT * FROM RDB$FUNCTION_ARGUMENTS '+
-      'where RDB$FUNCTION_Name = ''%s'' and RDB$MECHANISM = 0',[UDFName]);
+    SQLQuery1.SQL.Text := Format('SELECT * FROM RDB$FUNCTION_ARGUMENTS ' +
+      'where RDB$FUNCTION_Name = ''%s'' and RDB$MECHANISM = 0', [UDFName]);
     SQLQuery1.Open;
     while not SQLQuery1.EOF do
     begin
-      Params:= Params + LineEnding + GetFBTypeName(SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger,
+      Params := Params + LineEnding +
+        GetFBTypeName(SQLQuery1.FieldByName('RDB$FIELD_TYPE').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_LENGTH').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_PRECISION').AsInteger,
         SQLQuery1.FieldByName('RDB$FIELD_SCALE').AsInteger);
-      if SQLQuery1.FieldByName('field_type_int').AsInteger in [CharType, CStringType, VarCharType] then
-        Params:= Params + '(' + SQLQuery1.FieldByName('RDB$Character_LENGTH').AsString + ')';
+      if SQLQuery1.FieldByName('field_type_int').AsInteger in
+        [CharType, CStringType, VarCharType] then
+        Params := Params + '(' + SQLQuery1.FieldByName(
+          'RDB$Character_LENGTH').AsString + ')';
       SQLQuery1.Next;
       if not SQLQuery1.EOF then
-        Params:= Params + ', ';
+        Params := Params + ', ';
     end;
     SQLQuery1.Close;
-    Result:= True;
+    Result := True;
   except
     on E: Exception do
     begin
       ShowMessage(e.Message);
       FIBConnection.Close;
-      Result:= False;
+      Result := False;
     end;
   end;
 end;
 
 (***********  Show Query window  ************)
 
-function TfmMain.ShowQueryWindow(DatabaseIndex: Integer; ATitle: string): TfmQueryWindow;
+function TfmMain.ShowQueryWindow(DatabaseIndex: integer; ATitle: string): TfmQueryWindow;
 var
   Rec: TDatabaseRec;
   ATab: TTabSheet;
   ACaption: string;
 begin
-  Rec:= RegisteredDatabases[DatabaseIndex];
-  ACaption:= Rec.RegRec.Title + ': ' + ATitle;
+  Rec := RegisteredDatabases[DatabaseIndex];
+  ACaption := Rec.RegRec.Title + ': ' + ATitle;
 
   // Search for already opened query window for the same title
-  Result:= TfmQueryWindow(FindQueryWindow(ACaption));
+  Result := TfmQueryWindow(FindQueryWindow(ACaption));
 
   if Result = nil then
   begin
     // No opened query window
-    Result:= TfmQueryWindow.Create(Application);
-    ATab:= TTabSheet.Create(self);
-    ATab.Parent:= PageControl1;
-    ATab.Caption:= ACaption;
-    Result.Parent:= ATab;
-    Result.Left:= 0;
-    Result.Top:= 0;
-    Result.Align:= alClient;
-    Result.Font.Name:= 'Arial';
+    Result := TfmQueryWindow.Create(Application);
+    ATab := TTabSheet.Create(self);
+    ATab.Parent := PageControl1;
+    ATab.Caption := ACaption;
+    Result.Parent := ATab;
+    Result.Left := 0;
+    Result.Top := 0;
+    Result.Align := alClient;
+    Result.Font.Name := 'Arial';
   end
   else // Already opened query window found
-    ATab:= Result.Parent as TTabSheet;
+    ATab := Result.Parent as TTabSheet;
 
   Result.Init(DatabaseIndex);
-  ATab.Tag:= DatabaseIndex;
-  Result.Caption:= ACaption;
+  ATab.Tag := DatabaseIndex;
+  Result.Caption := ACaption;
   Result.Parent.Show;
-  Result.BorderStyle:= bsNone;
+  Result.BorderStyle := bsNone;
   OpenSQLHistory(Rec.RegRec.Title);
   Result.Show;
   fmMain.Show;
@@ -2902,190 +2977,191 @@ procedure TfmMain.FillObjectRoot(Node: TTreeNode);
 var
   Rec: TRegisteredDatabase;
   Objects: TStringList;
-  TableNode, Item, GenNode, TrigNode, ViewsNode :TTreeNode;
+  TableNode, Item, GenNode, TrigNode, ViewsNode: TTreeNode;
   StoredProcNode, UDFNode, SysTableNode, DomainsNode, ExceptionNode: TTreeNode;
   RoleNode, UserNode: TTreeNode;
-  i: Integer;
-  DBIndex: Integer;
-  Count: Integer;
+  i: integer;
+  DBIndex: integer;
+  Count: integer;
   ANodeText: string;
 begin
-  DBIndex:= PtrInt(Node.Parent.Data);
-  Rec:= RegisteredDatabases[DBIndex].RegRec;
-  Screen.Cursor:= crSQLWait;
-  Objects:= TStringList.Create;
+  DBIndex := PtrInt(Node.Parent.Data);
+  Rec := RegisteredDatabases[DBIndex].RegRec;
+  Screen.Cursor := crSQLWait;
+  Objects := TStringList.Create;
   try //try..finally for making sure Objects is released
     try //try..except for error reporting
-      ANodeText:= Node.Text;
+      ANodeText := Node.Text;
       if Pos('(', ANodeText) > 0 then
-        ANodeText:= Trim(Copy(ANodeText, 1, Pos('(', ANodeText) - 1));
+        ANodeText := Trim(Copy(ANodeText, 1, Pos('(', ANodeText) - 1));
 
       // Tables
       if ANodeText = 'Tables' then
       begin
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otTables, Count);
-        TableNode:= Node;
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otTables, Count);
+        TableNode := Node;
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
 
         TableNode.DeleteChildren;
 
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(TableNode, Objects[i]);
-          Item.ImageIndex:= 4;
-          Item.SelectedIndex:= 4;
+          Item := tvMain.Items.AddChild(TableNode, Objects[i]);
+          Item.ImageIndex := 4;
+          Item.SelectedIndex := 4;
         end;
 
       end
       else
-        // Generators
+      // Generators
       if ANodeText = 'Generators' then
       begin
-        GenNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otGenerators, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        GenNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otGenerators, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         GenNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(GenNode, Objects[i]);
-          Item.ImageIndex:= 6;
-          Item.SelectedIndex:= 6;
+          Item := tvMain.Items.AddChild(GenNode, Objects[i]);
+          Item.ImageIndex := 6;
+          Item.SelectedIndex := 6;
         end;
 
       end
       else
-        // Triggers
+      // Triggers
       if Node.Text = 'Triggers' then
       begin
-        TrigNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otTriggers, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        TrigNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otTriggers, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         TrigNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(TrigNode, Objects[i]);
-          Item.ImageIndex:= 8;
-          Item.SelectedIndex:= 8;
+          Item := tvMain.Items.AddChild(TrigNode, Objects[i]);
+          Item.ImageIndex := 8;
+          Item.SelectedIndex := 8;
         end;
       end
       else
-        // Views
+      // Views
       if Node.Text = 'Views' then
       begin
-        ViewsNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otViews, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        ViewsNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otViews, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         ViewsNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(ViewsNode, Objects[i]);
-          Item.ImageIndex:= 10;
-          Item.SelectedIndex:= 10;
+          Item := tvMain.Items.AddChild(ViewsNode, Objects[i]);
+          Item.ImageIndex := 10;
+          Item.SelectedIndex := 10;
         end;
       end
       else
-        // Stored Procedures
+      // Stored Procedures
       if Node.Text = 'Stored Procedures' then
       begin
-        StoredProcNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otStoredProcedures, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        StoredProcNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex,
+          otStoredProcedures, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         StoredProcNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(StoredProcNode, Objects[i]);
-          Item.ImageIndex:= 12;
-          Item.SelectedIndex:= 12;
+          Item := tvMain.Items.AddChild(StoredProcNode, Objects[i]);
+          Item.ImageIndex := 12;
+          Item.SelectedIndex := 12;
         end;
       end
       else
-        // UDF (Functions)
+      // UDF (Functions)
       if Node.Text = 'Functions' then
       begin
-        UDFNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otUDF, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        UDFNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otUDF, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         UDFNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(UDFNode, Objects[i]);
-          Item.ImageIndex:= 14;
-          Item.SelectedIndex:= 14;
+          Item := tvMain.Items.AddChild(UDFNode, Objects[i]);
+          Item.ImageIndex := 14;
+          Item.SelectedIndex := 14;
         end;
       end
       else
-        // System Tables
+      // System Tables
       if Node.Text = 'System Tables' then
       begin
-        SysTableNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otSystemTables, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        SysTableNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otSystemTables, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         SysTableNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(SysTableNode, Objects[i]);
-          Item.ImageIndex:= 16;
-          Item.SelectedIndex:= 16;
+          Item := tvMain.Items.AddChild(SysTableNode, Objects[i]);
+          Item.ImageIndex := 16;
+          Item.SelectedIndex := 16;
         end;
       end
       else
-        // Domains
+      // Domains
       if Node.Text = 'Domains' then
       begin
-        DomainsNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otDomains, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        DomainsNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otDomains, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         DomainsNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(DomainsNode, Objects[i]);
-          Item.ImageIndex:= 18;
-          Item.SelectedIndex:= 18;
+          Item := tvMain.Items.AddChild(DomainsNode, Objects[i]);
+          Item.ImageIndex := 18;
+          Item.SelectedIndex := 18;
         end;
       end
       else
-        // Roles
+      // Roles
       if Node.Text = 'Roles' then
       begin
-        RoleNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otRoles, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        RoleNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otRoles, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         RoleNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(RoleNode, Objects[i]);
-          Item.ImageIndex:= 20;
-          Item.SelectedIndex:= 20;
+          Item := tvMain.Items.AddChild(RoleNode, Objects[i]);
+          Item.ImageIndex := 20;
+          Item.SelectedIndex := 20;
         end;
       end
       else
-        // Exceptions
+      // Exceptions
       if Node.Text = 'Exceptions' then
       begin
-        ExceptionNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otExceptions, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        ExceptionNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otExceptions, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         ExceptionNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(ExceptionNode, Objects[i]);
-          Item.ImageIndex:= 22;
-          Item.SelectedIndex:= 22;
+          Item := tvMain.Items.AddChild(ExceptionNode, Objects[i]);
+          Item.ImageIndex := 22;
+          Item.SelectedIndex := 22;
         end;
       end
       else
-        // Users
+      // Users
       if Node.Text = 'Users' then
       begin
-        UserNode:= Node;
-        Objects.CommaText:= dmSysTables.GetDBObjectNames(DBIndex, otUsers, Count);
-        Node.Text:= ANodeText + ' (' + IntToStr(Count) + ')';
+        UserNode := Node;
+        Objects.CommaText := dmSysTables.GetDBObjectNames(DBIndex, otUsers, Count);
+        Node.Text := ANodeText + ' (' + IntToStr(Count) + ')';
         UserNode.DeleteChildren;
-        for i:= 0 to Objects.Count - 1 do
+        for i := 0 to Objects.Count - 1 do
         begin
-          Item:= tvMain.Items.AddChild(UserNode, Objects[i]);
-          Item.ImageIndex:= 24;
-          Item.SelectedIndex:= 24;
+          Item := tvMain.Items.AddChild(UserNode, Objects[i]);
+          Item.ImageIndex := 24;
+          Item.SelectedIndex := 24;
         end;
       end;
 
@@ -3094,40 +3170,39 @@ begin
     except
       on E: Exception do
       begin
-        Screen.Cursor:= crDefault;
+        Screen.Cursor := crDefault;
         ShowMessage(e.Message);
       end;
     end;
   finally
     Objects.Free;
-    Screen.Cursor:= crDefault;
+    Screen.Cursor := crDefault;
   end;
 end;
 
 (*************  Get main indices information  ******************)
 
-function TfmMain.GetIndices(ATableName: string; AQuery: TSQLQuery): Boolean;
+function TfmMain.GetIndices(ATableName: string; AQuery: TSQLQuery): boolean;
 begin
   AQuery.Close;
-  AQuery.SQL.Text:= 'SELECT * FROM RDB$INDICES WHERE RDB$RELATION_NAME=''' + UpperCase(ATableName) +
-    ''' AND RDB$FOREIGN_KEY IS NULL';
+  AQuery.SQL.Text := 'SELECT * FROM RDB$INDICES WHERE RDB$RELATION_NAME=''' +
+    UpperCase(ATableName) + ''' AND RDB$FOREIGN_KEY IS NULL';
   AQuery.Open;
-  Result:= AQuery.RecordCount > 0;
+  Result := AQuery.RecordCount > 0;
   if not Result then
     AQuery.Close;
-
 
 end;
 
 (***************  View Table Fields/ Fields Management  ***************)
 { todo: getting table field data should be moved to tablemanage.pas if possible; even better split out
 between non-GUI query part and GUI updater part}
-procedure TfmMain.ViewTableFields(ATableName: string; dbIndex: Integer;
+procedure TfmMain.ViewTableFields(ATableName: string; dbIndex: integer;
   AStringGrid: TStringGrid);
 var
   FieldSize: integer;
   FieldType: string;
-  i: Integer;
+  i: integer;
   PKFieldsList: TStringList;
   DefaultValue: string;
   PKIndexName: string;
@@ -3137,65 +3212,66 @@ begin
     GetFields(dbIndex, ATableName, nil);
 
     // Fill TableInfo grid
-    AStringGrid.RowCount:= 1;
+    AStringGrid.RowCount := 1;
     with AStringGrid, SQLQuery1 do
-    while not EOF do
-    begin
-      RowCount:= RowCount + 1;
+      while not EOF do
+      begin
+        RowCount := RowCount + 1;
 
-      // Field Name
-      Cells[1, RowCount - 1]:= Trim(FieldByName('Field_Name').AsString);
+        // Field Name
+        Cells[1, RowCount - 1] := Trim(FieldByName('Field_Name').AsString);
 
-      // Field Type
-      GetFieldType(SQLQuery1,FieldType,FieldSize);
-      Cells[2, RowCount - 1]:= FieldType;
+        // Field Type
+        GetFieldType(SQLQuery1, FieldType, FieldSize);
+        Cells[2, RowCount - 1] := FieldType;
 
-      // Computed fields (Calculated)
-      if FieldByName('computed_source').AsString <> '' then
-        Cells[2, RowCount - 1]:= FieldByName('computed_source').AsString;
+        // Computed fields (Calculated)
+        if FieldByName('computed_source').AsString <> '' then
+          Cells[2, RowCount - 1] := FieldByName('computed_source').AsString;
 
-      // Field Size
-      if FieldByName('field_type_int').AsInteger in [CharType,CStringType,VarCharType] then
-        Cells[3, RowCount - 1]:= FieldByName('CharacterLength').AsString
-      else // why show byte size for numerical fields like integer fields?
-        Cells[3, RowCount - 1]:= FieldByName('Field_Length').AsString;
+        // Field Size
+        if FieldByName('field_type_int').AsInteger in
+          [CharType, CStringType, VarCharType] then
+          Cells[3, RowCount - 1] := FieldByName('CharacterLength').AsString
+        else // why show byte size for numerical fields like integer fields?
+          Cells[3, RowCount - 1] := FieldByName('Field_Length').AsString;
 
-      // Null/Not null
-      if FieldByName('field_not_null_constraint').AsString = '1' then
-        Cells[4, RowCount - 1]:= '0'
-      else
-        Cells[4, RowCount - 1]:= '1';
+        // Null/Not null
+        if FieldByName('field_not_null_constraint').AsString = '1' then
+          Cells[4, RowCount - 1] := '0'
+        else
+          Cells[4, RowCount - 1] := '1';
 
-      // Default Value
-      DefaultValue:= FieldByName('Field_Default_Source').AsString;
-      if Pos('default', DefaultValue) > 0 then
-        DefaultValue:= Trim(StringReplace(DefaultValue, 'default', '', []));
-      Cells[5, RowCount - 1]:= DefaultValue;
+        // Default Value
+        DefaultValue := FieldByName('Field_Default_Source').AsString;
+        if Pos('default', DefaultValue) > 0 then
+          DefaultValue := Trim(StringReplace(DefaultValue, 'default', '', []));
+        Cells[5, RowCount - 1] := DefaultValue;
 
-      Cells[6, RowCount - 1]:= FieldByName('Field_Description').AsString;
-      Next;
-    end;
+        Cells[6, RowCount - 1] := FieldByName('Field_Description').AsString;
+        Next;
+      end;
     SQLQuery1.Close;
 
     // Primary Keys
-    PKFieldsList:= TStringList.Create;
+    PKFieldsList := TStringList.Create;
     try
-      PKIndexName:= GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
+      PKIndexName := GetPrimaryKeyIndexName(dbIndex, ATableName, ConstraintName);
       if PKIndexName <> '' then
         GetConstraintFields(ATableName, PKIndexName, PKFieldsList);
 
       with AStringGrid do
-      for i:= 1 to RowCount - 1 do
-        if PKFieldsList.IndexOf(Cells[1, i]) <> -1 then
-          Cells[0, i]:= '1'
-        else
-          Cells[0, i]:= '0';
+        for i := 1 to RowCount - 1 do
+          if PKFieldsList.IndexOf(Cells[1, i]) <> -1 then
+            Cells[0, i] := '1'
+          else
+            Cells[0, i] := '0';
     finally
       PKFieldsList.Free;
     end;
   except
     on E: Exception do
-      MessageDlg('Error while reading table fields: ' + e.Message, mtError, [mbOk], 0);
+      MessageDlg('Error while reading table fields: ' + e.Message, mtError, [mbOK], 0);
   end;
 end;
 
@@ -3208,35 +3284,36 @@ var
   Rec: TDatabaseRec;
   AViewName: string;
   ViewBody, Columns: string;
-  dbIndex: Integer;
+  dbIndex: integer;
   ATab: TTabSheet;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    Rec:= RegisteredDatabases[dbIndex];
-    AViewName:= SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    Rec := RegisteredDatabases[dbIndex];
+    AViewName := SelNode.Text;
 
     // Fill ViewView grid
-    ATab:= TTabSheet.Create(self);
-    ATab.Parent:= PageControl1;
-    fmViewView:= TfmViewView.Create(nil);
-    fmViewView.Parent:= ATab;
-    fmViewView.Left:= 0;
-    fmViewView.Top:= 0;
-    fmViewView.BorderStyle:= bsNone;
-    fmViewView.Align:= alClient;
-    fmViewView.SynSQLSyn1.TableNames.CommaText:= GetTableNames(dbIndex);
-    fmViewView.Caption:= 'View DDL: ' + AViewName;
-    ATab.Caption:= fmViewView.Caption;
-    fmViewView.edName.Caption:= AViewName;
-    ATab.Tag:= dbIndex;
+    ATab := TTabSheet.Create(self);
+    ATab.Parent := PageControl1;
+    fmViewView := TfmViewView.Create(nil);
+    fmViewView.Parent := ATab;
+    fmViewView.Left := 0;
+    fmViewView.Top := 0;
+    fmViewView.BorderStyle := bsNone;
+    fmViewView.Align := alClient;
+    fmViewView.SynSQLSyn1.TableNames.CommaText := GetTableNames(dbIndex);
+    fmViewView.Caption := 'View DDL: ' + AViewName;
+    ATab.Caption := fmViewView.Caption;
+    fmViewView.edName.Caption := AViewName;
+    ATab.Tag := dbIndex;
 
     GetViewInfo(dbIndex, AViewName, Columns, ViewBody);
     fmViewView.seScript.Lines.Clear;
-    fmViewView.seScript.Lines.Text:= 'create view "' + AviewName + '" (' + Columns + ')' + LineEnding + ViewBody;
-    PageControl1.ActivePage:= ATab;
+    fmViewView.seScript.Lines.Text :=
+      'create view "' + AviewName + '" (' + Columns + ')' + LineEnding + ViewBody;
+    PageControl1.ActivePage := ATab;
     fmViewView.Show;
   end;
 
@@ -3247,71 +3324,71 @@ end;
 procedure TfmMain.lmViewFieldsClick(Sender: TObject);
 var
   Node: TTreeNode;
-  dbIndex: Integer;
+  dbIndex: integer;
   FieldTitle: string;
   FieldNode: TTreeNode;
   PKFieldsList: TStringList;
   PKIndexName: string;
   ConstraintName: string;
   AFieldName: string;
-  i: Integer;
+  i: integer;
   LenStr: string;
 begin
   try
-    Node:= tvMain.Selected;
-    dbIndex:= PtrInt(Node.Parent.Parent.Data);
+    Node := tvMain.Selected;
+    dbIndex := PtrInt(Node.Parent.Parent.Data);
     Node.DeleteChildren;
 
     // Primary Keys
-    PKFieldsList:= TStringList.Create;
+    PKFieldsList := TStringList.Create;
     try
-      PKIndexName:= GetPrimaryKeyIndexName(dbIndex, Node.Text, ConstraintName);
+      PKIndexName := GetPrimaryKeyIndexName(dbIndex, Node.Text, ConstraintName);
       if PKIndexName <> '' then
         GetConstraintFields(Node.Text, PKIndexName, PKFieldsList);
 
       // Fields
       GetFields(dbIndex, Node.Text, nil);
-      i:= 1;
+      i := 1;
       with SQLQuery1 do
-      while not EOF do
-      begin
-        AFieldName:= Trim(FieldByName('Field_Name').AsString);
+        while not EOF do
+        begin
+          AFieldName := Trim(FieldByName('Field_Name').AsString);
 
-        if (FieldByName('field_type_int').AsInteger) in [CharType, CStringType, VarCharType] then
-          LenStr:= FieldByName('CharacterLength').AsString
-        else
+          if (FieldByName('field_type_int').AsInteger) in
+            [CharType, CStringType, VarCharType] then
+            LenStr := FieldByName('CharacterLength').AsString
+          else
           {note: this shows number of bytes for numerical datatypes. Is this really wanted?
           It's very awkward e.g. for decimal: e.g. Decimal(12,2) 8 }
-          LenStr:= FieldByName('Field_Length').AsString;
+            LenStr := FieldByName('Field_Length').AsString;
 
-        // Array datatype:
-        if not(FieldByName('array_upper_bound').IsNull) then
-          LenStr:= LenStr + ' [' + FieldByName('array_upper_bound').AsString + '] ';
+          // Array datatype:
+          if not (FieldByName('array_upper_bound').IsNull) then
+            LenStr := LenStr + ' [' + FieldByName('array_upper_bound').AsString + '] ';
 
-        FieldTitle:= AFieldName + '   ' +
-        GetFBTypeName(SQLQuery1.FieldByName('field_type_int').AsInteger,
-          SQLQuery1.FieldByName('field_sub_type').AsInteger,
-          SQLQuery1.FieldByName('field_length').AsInteger,
-          SQLQuery1.FieldByName('field_precision').AsInteger,
-          SQLQuery1.FieldByName('field_scale').AsInteger) +
-          ' ' + LenStr;
-        FieldNode:= tvMain.Items.AddChild(Node, FieldTitle);
-        FieldNode.Data:= Pointer(i); //store field order in node's data property
+          FieldTitle := AFieldName + '   ' + GetFBTypeName(
+            SQLQuery1.FieldByName('field_type_int').AsInteger,
+            SQLQuery1.FieldByName('field_sub_type').AsInteger,
+            SQLQuery1.FieldByName('field_length').AsInteger,
+            SQLQuery1.FieldByName('field_precision').AsInteger,
+            SQLQuery1.FieldByName('field_scale').AsInteger) + ' ' + LenStr;
+          FieldNode := tvMain.Items.AddChild(Node, FieldTitle);
+          FieldNode.Data := Pointer(i); //store field order in node's data property
 
-        // Visually distinguish primary keys
-        if PKFieldsList.IndexOf(AFieldname) <> -1 then
-        begin
-          FieldNode.ImageIndex:= 28;
-          FieldNode.SelectedIndex:= 28;
-        end
-        else
-        begin
-          FieldNode.ImageIndex:= 27;
-          FieldNode.SelectedIndex:= 27;
+          // Visually distinguish primary keys
+          if PKFieldsList.IndexOf(AFieldname) <> -1 then
+          begin
+            FieldNode.ImageIndex := 28;
+            FieldNode.SelectedIndex := 28;
+          end
+          else
+          begin
+            FieldNode.ImageIndex := 27;
+            FieldNode.SelectedIndex := 27;
+          end;
+          Inc(i);
+          Next;
         end;
-        Inc(i);
-        Next;
-      end;
       SQLQuery1.Close;
       Node.Expand(False);
     finally
@@ -3331,48 +3408,48 @@ var
   SelNode: TTreeNode;
   Rec: TDatabaseRec;
   AGenName: string;
-  dbIndex: Integer;
+  dbIndex: integer;
   ATab: TTabSheet;
   Title: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    Rec:= RegisteredDatabases[dbIndex];
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    Rec := RegisteredDatabases[dbIndex];
     SQLQuery1.Close;
     SetConnection(dbIndex);
-    AGenName:= SelNode.Text;
-    SQLQuery1.SQL.Text:= 'select GEN_ID(' + AGenName + ', 0) from RDB$Database;';
+    AGenName := SelNode.Text;
+    SQLQuery1.SQL.Text := 'select GEN_ID(' + AGenName + ', 0) from RDB$Database;';
     SQLQuery1.Open;
 
     // Fill ViewGen form
-    Title:= 'Generator : ' + AGenName;
-    fmViewGen:= FindCustomForm(Title, TfmViewGen) as TfmViewGen;
+    Title := 'Generator : ' + AGenName;
+    fmViewGen := FindCustomForm(Title, TfmViewGen) as TfmViewGen;
     if fmViewGen = nil then
     begin
-      fmViewGen:= TfmViewGen.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      fmViewGen.Parent:= ATab;
-      fmViewGen.Left:= 0;
-      fmViewGen.Top:= 0;
-      fmViewGen.BorderStyle:= bsNone;
-      fmViewGen.Align:= alClient;
+      fmViewGen := TfmViewGen.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      fmViewGen.Parent := ATab;
+      fmViewGen.Left := 0;
+      fmViewGen.Top := 0;
+      fmViewGen.BorderStyle := bsNone;
+      fmViewGen.Align := alClient;
     end
     else
-      ATab:= fmViewGen.Parent as TTabSheet;
-    PageControl1.ActivePage:= ATab;
-    ATab.Tag:= dbIndex;
+      ATab := fmViewGen.Parent as TTabSheet;
+    PageControl1.ActivePage := ATab;
+    ATab.Tag := dbIndex;
 
     with fmViewGen do
     begin
-      Caption:= Title;
-      ATab.Caption:= Caption;
-      edGenName.Caption:= AGenName;
-      edValue.Caption:= SQLQuery1.Fields[0].AsString;
+      Caption := Title;
+      ATab.Caption := Caption;
+      edGenName.Caption := AGenName;
+      edValue.Caption := SQLQuery1.Fields[0].AsString;
     end;
-    ATab.Caption:= Title;
+    ATab.Caption := Title;
     fmViewGen.Show;
   end;
 
@@ -3386,46 +3463,46 @@ var
   AProcName: string;
   SPOwner: string;
   spBody: string;
-  dbIndex: Integer;
+  dbIndex: integer;
   ATab: TTabSheet;
   Title: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    AProcName:= SelNode.Text;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
-    SPBody:= GetStoredProcBody(dbIndex, AProcName, SPOwner);
-    Title:= SelNode.Parent.Parent.Text +  ': StoredProcedure : ' + AProcName;
+    AProcName := SelNode.Text;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
+    SPBody := GetStoredProcBody(dbIndex, AProcName, SPOwner);
+    Title := SelNode.Parent.Parent.Text + ': StoredProcedure : ' + AProcName;
     // Fill SProc Parameters
-    fmViewSProc:= FindCustomForm(Title, TfmViewSProc) as TfmViewSProc;
+    fmViewSProc := FindCustomForm(Title, TfmViewSProc) as TfmViewSProc;
     if fmViewSProc = nil then
     begin
-      fmViewSProc:= TfmViewSProc.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      fmViewSProc.Parent:= ATab;
-      fmViewSProc.Left:= 0;
-      fmViewSProc.Top:= 0;
-      fmViewSProc.BorderStyle:= bsNone;
-      fmViewSProc.Align:= alClient;
+      fmViewSProc := TfmViewSProc.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      fmViewSProc.Parent := ATab;
+      fmViewSProc.Left := 0;
+      fmViewSProc.Top := 0;
+      fmViewSProc.BorderStyle := bsNone;
+      fmViewSProc.Align := alClient;
     end
     else
-      ATab:= fmViewSProc.Parent as TTabSheet;
-    PageControl1.ActivePage:= ATab;
+      ATab := fmViewSProc.Parent as TTabSheet;
+    PageControl1.ActivePage := ATab;
     with fmViewSProc do
     begin
-      SynSQLSyn1.TableNames.CommaText:= GetTableNames(dbIndex);
-      Caption:= Title;
-      ATab.Caption:= Caption;
-      ATab.Tag:= dbIndex;
-      edName.Caption:= AProcName;
+      SynSQLSyn1.TableNames.CommaText := GetTableNames(dbIndex);
+      Caption := Title;
+      ATab.Caption := Caption;
+      ATab.Tag := dbIndex;
+      edName.Caption := AProcName;
       seScript.Lines.Clear;
       seScript.Lines.Add('create procedure ' + AProcName + '(');
-      edOwner.Caption:= SPOwner;
+      edOwner.Caption := SPOwner;
 
       // Procedure body
-      seScript.Lines.Text:= seScript.Lines.Text + spBody;
+      seScript.Lines.Text := seScript.Lines.Text + spBody;
 
       fmViewSProc.Show;
     end; // with fmViewSProc
@@ -3441,61 +3518,61 @@ var
   SelNode: TTreeNode;
   ATriggerName: string;
   Event: string;
-  TriggerEnabled: Boolean;
+  TriggerEnabled: boolean;
   Body: string;
   BeforeAfter: string;
   OnTable: string;
-  TriggerPosition: Integer;
+  TriggerPosition: integer;
   ATab: TTabSheet;
   Title: string;
-  dbIndex: Integer;
+  dbIndex: integer;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    ATriggerName:= SelNode.Text;
-    Title:= SelNode.Parent.Parent.Text +  ': Trigger : ' + ATriggerName;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
+    ATriggerName := SelNode.Text;
+    Title := SelNode.Parent.Parent.Text + ': Trigger : ' + ATriggerName;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
     dmSysTables.GetTriggerInfo(dbIndex, ATriggerName, BeforeAfter, OnTable,
       Event, Body, TriggerEnabled, TriggerPosition);
 
     // Fill ViewTrigger form
-    fmViewTrigger:= FindCustomForm(Title, TfmViewTrigger) as TfmViewTrigger;
+    fmViewTrigger := FindCustomForm(Title, TfmViewTrigger) as TfmViewTrigger;
     if fmViewTrigger = nil then
     begin
-      fmViewTrigger:= TfmViewTrigger.Create(Application);
-      ATab:= TTabSheet.Create(self);
-      ATab.Parent:= PageControl1;
-      fmViewTrigger.Parent:= ATab;
-      fmViewTrigger.Left:= 0;
-      fmViewTrigger.Top:= 0;
-      fmViewTrigger.BorderStyle:= bsNone;
-      fmViewTrigger.Align:= alClient;
+      fmViewTrigger := TfmViewTrigger.Create(Application);
+      ATab := TTabSheet.Create(self);
+      ATab.Parent := PageControl1;
+      fmViewTrigger.Parent := ATab;
+      fmViewTrigger.Left := 0;
+      fmViewTrigger.Top := 0;
+      fmViewTrigger.BorderStyle := bsNone;
+      fmViewTrigger.Align := alClient;
     end
     else
-      ATab:= fmViewTrigger.Parent as TTabSheet;
+      ATab := fmViewTrigger.Parent as TTabSheet;
 
-    PageControl1.ActivePage:= ATab;
-    ATab.Tag:= dbIndex;
+    PageControl1.ActivePage := ATab;
+    ATab.Tag := dbIndex;
     with fmViewTrigger do
     begin
-      Caption:= Title;
-      ATab.Caption:= Caption;
-      edName.Caption:= ATriggerName;
-      edOnTable.Caption:= OnTable;
-      laEvent.Caption:= Event;
-      laType.Caption:= BeforeAfter;
-      laPos.Caption:= IntToStr(TriggerPosition);
-      seScript.Lines.Text:= Body;
+      Caption := Title;
+      ATab.Caption := Caption;
+      edName.Caption := ATriggerName;
+      edOnTable.Caption := OnTable;
+      laEvent.Caption := Event;
+      laType.Caption := BeforeAfter;
+      laPos.Caption := IntToStr(TriggerPosition);
+      seScript.Lines.Text := Body;
       if TriggerEnabled then
       begin
-        laEnabled.Caption:= 'Yes';
-        laEnabled.Font.Color:= clGreen;
+        laEnabled.Caption := 'Yes';
+        laEnabled.Font.Color := clGreen;
       end
       else
       begin
-        laEnabled.Caption:= 'No';
-        laEnabled.Font.Color:= clRed;
+        laEnabled.Caption := 'No';
+        laEnabled.Font.Color := clRed;
       end;
     end;
     fmViewTrigger.Show;
@@ -3512,46 +3589,46 @@ var
   ModuleName, EntryPoint: string;
   Params: string;
   ATab: TTabSheet;
-  dbIndex: Integer;
+  dbIndex: integer;
   Title: string;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    AFuncName:= SelNode.Text;
-    Title:= SelNode.Parent.Parent.Text + ': UDF: ' + AFuncName;
-    dbIndex:= PtrInt(SelNode.Parent.Parent.Data);
+    AFuncName := SelNode.Text;
+    Title := SelNode.Parent.Parent.Text + ': UDF: ' + AFuncName;
+    dbIndex := PtrInt(SelNode.Parent.Parent.Data);
 
     if GetUDFInfo(dbIndex, AFuncName, ModuleName, EntryPoint, Params) then
-    with fmUDFINfo do
-    begin
-      fmUDFInfo:= FindCustomForm(Title, TfmUDFInfo) as TfmUDFInfo;
-      if fmUDFInfo = nil then
+      with fmUDFINfo do
       begin
-        fmUDFInfo:= TfmUDFInfo.Create(Application);
-        fmUDFInfo.Caption:= Title;
-        ATab:= TTabSheet.Create(self);
-        ATab.Parent:= PageControl1;
-        fmUDFInfo.Parent:= ATab;
-        ATab.Tag:= dbIndex;
-        fmUDFInfo.Left:= 0;
-        fmUDFInfo.Top:= 0;
-        fmUDFInfo.BorderStyle:= bsNone;
-        fmUDFInfo.Align:= alClient;
-      end
-      else
-        ATab:= fmUDFInfo.Parent as TTabSheet;
+        fmUDFInfo := FindCustomForm(Title, TfmUDFInfo) as TfmUDFInfo;
+        if fmUDFInfo = nil then
+        begin
+          fmUDFInfo := TfmUDFInfo.Create(Application);
+          fmUDFInfo.Caption := Title;
+          ATab := TTabSheet.Create(self);
+          ATab.Parent := PageControl1;
+          fmUDFInfo.Parent := ATab;
+          ATab.Tag := dbIndex;
+          fmUDFInfo.Left := 0;
+          fmUDFInfo.Top := 0;
+          fmUDFInfo.BorderStyle := bsNone;
+          fmUDFInfo.Align := alClient;
+        end
+        else
+          ATab := fmUDFInfo.Parent as TTabSheet;
 
-      PageControl1.ActivePage:= ATab;
-      ATab.Caption:= Title;
-      edName.Caption:= AFuncName;
-      edModule.Caption:= ModuleName;
-      edEntry.Caption:= EntryPoint;
-      meBody.Clear;
-      meBody.Lines.Add('function ' + AFuncName + '(');
-      meBody.Lines.Add(Params);
-      fmUDFInfo.Show;
-    end; // with fmUDFInfo
+        PageControl1.ActivePage := ATab;
+        ATab.Caption := Title;
+        edName.Caption := AFuncName;
+        edModule.Caption := ModuleName;
+        edEntry.Caption := EntryPoint;
+        meBody.Clear;
+        meBody.Lines.Add('function ' + AFuncName + '(');
+        meBody.Lines.Add(Params);
+        fmUDFInfo.Show;
+      end; // with fmUDFInfo
   end;
 end;
 
@@ -3560,14 +3637,14 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
-  if MessageDlg('Are you sure you want to delete ' + SelNode.Text + ' permanently', mtConfirmation,
-    [mbYes, mbNo], 0) = mrYes then
+  SelNode := tvMain.Selected;
+  if MessageDlg('Are you sure you want to delete ' + SelNode.Text +
+    ' permanently', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     // Move selection to tables above so object is not in use when deleting it
-    SelNode.Collapse(true);
-    SelNode.Parent.Selected:=true;
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Drop Table');
+    SelNode.Collapse(True);
+    SelNode.Parent.Selected := True;
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Drop Table');
     QWindow.meQuery.Lines.Clear;
     QWindow.meQuery.Lines.Add('DROP TABLE ' + SelNode.Text + ';');
     QWindow.Show;
@@ -3579,42 +3656,42 @@ var
   Message: string;
 begin
   //Recalculate index statistics. May take a while for big dbs.
-  Message:= '';
-  Screen.Cursor:= crSQLWait;
+  Message := '';
+  Screen.Cursor := crSQLWait;
   try
     try
       dmSysTables.RecalculateIndexStatistics(PtrInt(tvMain.Selected.Data));
     except
       on E: Exception do
       begin
-        Message:= E.Message
+        Message := E.Message;
       end;
     end;
   finally
-    Screen.Cursor:= crDefault;
+    Screen.Cursor := crDefault;
   end;
-  if Message='' then
+  if Message = '' then
     ShowMessage('Recalculation of index statistics complete.')
   else
-    ShowMessage('Error recalculating index statistics: '+Message);
+    ShowMessage('Error recalculating index statistics: ' + Message);
 end;
 
 procedure TfmMain.mnEditorFontClick(Sender: TObject);
 var
   configFile: TIniFile;
-  configFilePath: String;
+  configFilePath: string;
 
 begin
-     configFilePath:= ConcatPaths([ExtractFilePath(Application.ExeName), 'config.ini']);
-     configFile:= TIniFile.Create(configFilePath);
+  configFilePath := ConcatPaths([ExtractFilePath(Application.ExeName), 'config.ini']);
+  configFile := TIniFile.Create(configFilePath);
 
-     if editorFontDialog.Execute then
-     begin
-        configFile.WriteString('Editor Font', 'font_name', editorFontDialog.Font.Name);
-        configFile.WriteInteger('Editor Font', 'font_size', editorFontDialog.Font.Size);
+  if editorFontDialog.Execute then
+  begin
+    configFile.WriteString('Editor Font', 'font_name', editorFontDialog.Font.Name);
+    configFile.WriteInteger('Editor Font', 'font_size', editorFontDialog.Font.Size);
 
-     end;
-     configFile.Free;
+  end;
+  configFile.Free;
 end;
 
 (********  Create new database  ********)
@@ -3629,9 +3706,9 @@ end;
 
 procedure TfmMain.mnRegDBClick(Sender: TObject);
 begin
-  fmReg.NewReg:= True;
-  fmReg.bbReg.Caption:= 'Register';
-  if fmReg.ShowModal = mrOK then
+  fmReg.NewReg := True;
+  fmReg.bbReg.Caption := 'Register';
+  if fmReg.ShowModal = mrOk then
   begin
     LoadRegisteredDatabases;
     fmReg.SaveRegistrations;
@@ -3643,7 +3720,7 @@ end;
 
 procedure TfmMain.mnAboutClick(Sender: TObject);
 begin
-  fmAbout:= TfmAbout.Create(nil);
+  fmAbout := TfmAbout.Create(nil);
   fmAbout.Init;
   fmAbout.Show;
 end;
@@ -3655,23 +3732,23 @@ var
   Rec: TRegisteredDatabase;
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if SelNode <> nil then
   begin
-    fmReg.NewReg:= False;
-    fmReg.bbReg.Caption:= 'Save';
-    fmreg.RecPos:= RegisteredDatabases[PtrInt(SelNode.Data)].Index;
+    fmReg.NewReg := False;
+    fmReg.bbReg.Caption := 'Save';
+    fmreg.RecPos := RegisteredDatabases[PtrInt(SelNode.Data)].Index;
 
-    Rec:= RegisteredDatabases[PtrInt(SelNode.Data)].OrigRegRec;
-    fmReg.edDatabaseName.Text:= Rec.DatabaseName;
-    fmReg.edTitle.Text:= Rec.Title;
-    fmReg.edUserName.Text:= Rec.UserName;
-    fmReg.edPassword.Text:= Rec.Password;
-    fmReg.cbCharset.Text:= Rec.Charset;
-    fmReg.edRole.Text:= Rec.Role;
-    fmReg.cxSavePassword.Checked:= Rec.SavePassword;
+    Rec := RegisteredDatabases[PtrInt(SelNode.Data)].OrigRegRec;
+    fmReg.edDatabaseName.Text := Rec.DatabaseName;
+    fmReg.edTitle.Text := Rec.Title;
+    fmReg.edUserName.Text := Rec.UserName;
+    fmReg.edPassword.Text := Rec.Password;
+    fmReg.cbCharset.Text := Rec.Charset;
+    fmReg.edRole.Text := Rec.Role;
+    fmReg.cxSavePassword.Checked := Rec.SavePassword;
 
-    if fmReg.ShowModal = mrOK then
+    if fmReg.ShowModal = mrOk then
     begin
       LoadRegisteredDatabases;
       fmReg.SaveRegistrations;
@@ -3687,14 +3764,15 @@ procedure TfmMain.lmUnregisterDatabaseClick(Sender: TObject);
 var
   SelNode: TTreeNode;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) and (SelNode.Parent.Parent = nil) then
-  if MessageDlg('Are you sure you want to Unregister this database', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-  begin
-    DeleteRegistration(RegisteredDatabases[PtrInt(SelNode.Data)].Index);
-    LoadRegisteredDatabases;
-  end;
-  SelNode:= nil;
+    if MessageDlg('Are you sure you want to Unregister this database',
+      mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    begin
+      DeleteRegistration(RegisteredDatabases[PtrInt(SelNode.Data)].Index);
+      LoadRegisteredDatabases;
+    end;
+  SelNode := nil;
 end;
 
 (**********  View 1000 records  **************)
@@ -3704,11 +3782,12 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data), 'Select first 1000 from ' + SelNode.Text);
-    QWindow.meQuery.Lines.Text:= 'select first 1000 * from "' + SelNode.Text + '"';
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Parent.Data),
+      'Select first 1000 from ' + SelNode.Text);
+    QWindow.meQuery.Lines.Text := 'select first 1000 * from "' + SelNode.Text + '"';
     QWindow.bbRunClick(nil);
     QWindow.Show;
   end;
@@ -3721,10 +3800,10 @@ var
   SelNode: TTreeNode;
   QWindow: TfmQueryWindow;
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
   if (SelNode <> nil) and (SelNode.Parent <> nil) then
   begin
-    QWindow:= ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new Role');
+    QWindow := ShowQueryWindow(PtrInt(SelNode.Parent.Data), 'Create new Role');
     QWindow.meQuery.Lines.Clear;
     QWindow.meQuery.Lines.Add('CREATE ROLE role_name;');
     QWindow.Show;
@@ -3734,17 +3813,17 @@ end;
 procedure TfmMain.mnRestoreClick(Sender: TObject);
 begin
   fmBackupRestore.Init('', '', '', '');
-  fmBackupRestore.cbOperation.ItemIndex:= 1;
-  fmBackupRestore.cbOperation.Enabled:= False;
+  fmBackupRestore.cbOperation.ItemIndex := 1;
+  fmBackupRestore.cbOperation.Enabled := False;
   fmBackupRestore.meLog.Clear;
   fmBackupRestore.Show;
 end;
 
 procedure TfmMain.PageControl1CloseTabClicked(Sender: TObject);
 var
-  i: Integer;
+  i: integer;
 begin
-  for i:= 0 to Application.ComponentCount - 1 do
+  for i := 0 to Application.ComponentCount - 1 do
     if Application.Components[i] is TfmQueryWindow then
     begin
       (Application.Components[i] as TfmQueryWindow).lmCloseTabClick(nil);
@@ -3757,124 +3836,124 @@ end;
 procedure TfmMain.pmDatabasePopup(Sender: TObject);
 var
   SelNode: TTreeNode;
-  Filter: Integer;
-  i: Integer;
+  Filter: integer;
+  i: integer;
   ParentNodeText: string;
   NodeText: string;
 
 begin
-  SelNode:= tvMain.Selected;
+  SelNode := tvMain.Selected;
 
   if SelNode <> nil then
   begin
-    NodeText:= SelNode.Text;
+    NodeText := SelNode.Text;
     if Pos('(', NodeText) > 0 then
-      NodeText:= Trim(Copy(NodeText, 1, Pos('(', NodeText) - 1));
+      NodeText := Trim(Copy(NodeText, 1, Pos('(', NodeText) - 1));
 
-    ParentNodeText:= '';
+    ParentNodeText := '';
     if SelNode.Parent <> nil then
-      ParentNodeText:= SelNode.Parent.Text;
+      ParentNodeText := SelNode.Parent.Text;
     if Pos('(', ParentNodeText) > 0 then
-      ParentNodeText:= Trim(Copy(ParentNodeText, 1, Pos('(', ParentNodeText) - 1));
+      ParentNodeText := Trim(Copy(ParentNodeText, 1, Pos('(', ParentNodeText) - 1));
 
     if (SelNode <> nil) then
-    if (SelNode.Parent = nil) then // Servers
-      Filter:= -2
-    else
-    if (SelNode.Parent.Parent = nil) then // Database
-      Filter:= 0
-    else
-    if ParentNodeText = 'Tables' then // Tables
-      Filter:= 1
-    else
-    if ParentNodeText = 'Generators' then // Generators
-      Filter:= 2
-    else
-    if ParentNodeText = 'Triggers' then // Triggers
-      Filter:= 3
-    else
-    if ParentNodeText = 'Views' then // View
-      Filter:= 4
-    else
-    if ParentNodeText = 'Stored Procedures' then // Stored Proc
-      Filter:= 5
-    else
-    if ParentNodeText = 'Functions' then // UDF
-      Filter:= 6
-    else
-    if ParentNodeText = 'System Tables' then // System Tables
-      Filter:= 7
-    else
-    if ParentNodeText = 'Domains' then // Domains
-      Filter:= 8
-    else
-    if ParentNodeText = 'Roles' then // Roles
-      Filter:= 9
-    else
-    if ParentNodeText = 'Exceptions' then // Roles
-      Filter:= 10
-    else
-    if ParentNodeText = 'Users' then // Users
-      Filter:= 111
-    else
-    if NodeText = 'Tables' then // Tables root              //  Higher level (Roots)
-      Filter:= 11
-    else
-    if NodeText = 'Generators' then // Generators root
-      Filter:= 12
-    else
-    if NodeText = 'Stored Procedures' then // Stored Proc root
-      Filter:= 15
-    else
-    if NodeText = 'Functions' then // UDF root
-      Filter:= 16
-    else
-    if NodeText = 'Views' then // Views root
-      Filter:= 14
-    else
-    if NodeText = 'Triggers' then // Triggers root
-      Filter:= 13
-    else
-    if NodeText = 'Domains' then // Domains root
-      Filter:= 18
-    else
-    if NodeText = 'Roles' then // Roles root
-      Filter:= 19
-    else
-    if NodeText = 'Exceptions' then // Exceptions
-      Filter:= 20
-    else
-    if NodeText = 'Users' then // Users
-      Filter:= 21
-    else
-    if NodeText = 'Query Window' then // Query Window
-      Filter:= 30
-    else
-      Filter:= -1;
+      if (SelNode.Parent = nil) then // Servers
+        Filter := -2
+      else
+      if (SelNode.Parent.Parent = nil) then // Database
+        Filter := 0
+      else
+      if ParentNodeText = 'Tables' then // Tables
+        Filter := 1
+      else
+      if ParentNodeText = 'Generators' then // Generators
+        Filter := 2
+      else
+      if ParentNodeText = 'Triggers' then // Triggers
+        Filter := 3
+      else
+      if ParentNodeText = 'Views' then // View
+        Filter := 4
+      else
+      if ParentNodeText = 'Stored Procedures' then // Stored Proc
+        Filter := 5
+      else
+      if ParentNodeText = 'Functions' then // UDF
+        Filter := 6
+      else
+      if ParentNodeText = 'System Tables' then // System Tables
+        Filter := 7
+      else
+      if ParentNodeText = 'Domains' then // Domains
+        Filter := 8
+      else
+      if ParentNodeText = 'Roles' then // Roles
+        Filter := 9
+      else
+      if ParentNodeText = 'Exceptions' then // Roles
+        Filter := 10
+      else
+      if ParentNodeText = 'Users' then // Users
+        Filter := 111
+      else
+      if NodeText = 'Tables' then // Tables root              //  Higher level (Roots)
+        Filter := 11
+      else
+      if NodeText = 'Generators' then // Generators root
+        Filter := 12
+      else
+      if NodeText = 'Stored Procedures' then // Stored Proc root
+        Filter := 15
+      else
+      if NodeText = 'Functions' then // UDF root
+        Filter := 16
+      else
+      if NodeText = 'Views' then // Views root
+        Filter := 14
+      else
+      if NodeText = 'Triggers' then // Triggers root
+        Filter := 13
+      else
+      if NodeText = 'Domains' then // Domains root
+        Filter := 18
+      else
+      if NodeText = 'Roles' then // Roles root
+        Filter := 19
+      else
+      if NodeText = 'Exceptions' then // Exceptions
+        Filter := 20
+      else
+      if NodeText = 'Users' then // Users
+        Filter := 21
+      else
+      if NodeText = 'Query Window' then // Query Window
+        Filter := 30
+      else
+        Filter := -1;
 
     // Table Fields
     if (SelNode.Level = 4) then
     begin
-      ParentNodeText:= SelNode.Parent.Parent.Text;
+      ParentNodeText := SelNode.Parent.Parent.Text;
       if Pos('(', ParentNodeText) > 0 then
-        ParentNodeText:= Trim(Copy(ParentNodeText, 1, Pos('(', ParentNodeText) - 1));
+        ParentNodeText := Trim(Copy(ParentNodeText, 1, Pos('(', ParentNodeText) - 1));
       if (ParentNodeText = 'Tables') then
-        Filter:= 112;
+        Filter := 112;
     end;
-
 
   end
   else
-    Filter:= -1;
+    Filter := -1;
 
   // Show menu for specific filter
-  for i:= 0 to pmDatabase.Items.Count - 1 do
-    pmDatabase.Items[i].Visible:= (pmDatabase.Items[i].Tag = Filter) or
-      ((pmDatabase.Items[i].Tag = 100) and (SelNode <> nil) and (SelNode.Parent <> nil) and
-      (SelNode.Parent.Parent <> nil) and (SelNode.Parent.Parent.Parent = nil));
+  for i := 0 to pmDatabase.Items.Count - 1 do
+    pmDatabase.Items[i].Visible :=
+      (pmDatabase.Items[i].Tag = Filter) or ((pmDatabase.Items[i].Tag = 100) and
+      (SelNode <> nil) and (SelNode.Parent <> nil) and (SelNode.Parent.Parent <> nil) and
+      (SelNode.Parent.Parent.Parent = nil));
 
 
-  SelNode:= nil;
+  SelNode := nil;
 end;
 
 
@@ -3887,7 +3966,7 @@ var
   Node: TTreeNode;
   ParentText: string;
 begin
-  Node:= tvMain.Selected;
+  Node := tvMain.Selected;
   if node <> nil then
   begin
     case Node.Level of
@@ -3899,20 +3978,20 @@ begin
       begin
         if tvMain.Selected.Text = 'Query Window' then
         begin
-          QWindow:= ShowQueryWindow(PtrInt(tvMain.Selected.Parent.Data), 'Query Window');
+          QWindow := ShowQueryWindow(PtrInt(tvMain.Selected.Parent.Data), 'Query Window');
           QWindow.Show;
         end
         else  // Expand object
         begin
           tvMainExpanded(nil, Node);
-          Rec:= RegisteredDatabases[PtrInt(Node.Parent.Data)].RegRec;
+          Rec := RegisteredDatabases[PtrInt(Node.Parent.Data)].RegRec;
         end;
       end;
       3: // Object Item Level, like tables, procedures....
       begin
-        ParentText:= Node.Parent.Text;
+        ParentText := Node.Parent.Text;
         if Pos('(', ParentText) > 0 then
-          ParentText:= Trim(Copy(ParentText, 1, Pos('(', ParentText) - 1));
+          ParentText := Trim(Copy(ParentText, 1, Pos('(', ParentText) - 1));
 
         case ParentText of
           'Tables':
@@ -3934,7 +4013,8 @@ begin
           'Roles': lmPermissionsClick(nil);
           'Exceptions': lmScriptExceptionClick(nil);
           'Users': lmPermissionsClick(nil);
-          else ShowMessage('Error in TurboBird code tVMainDblClick level 3. Please correct.');
+          else
+            ShowMessage('Error in TurboBird code tVMainDblClick level 3. Please correct.');
         end;
       end;
       4: // Table fields (Edit)
@@ -3956,52 +4036,58 @@ var
   Rec: TRegisteredDatabase;
 begin
   if (Node <> nil) then
-  if (Node.Parent <> nil) and (Node.Parent.Parent = nil) then   // Expand database
-  begin
-    Rec:= RegisteredDatabases[PtrInt(Node.Data)].RegRec;
-    RegisteredDatabases[PtrInt(Node.Data)].RegRec.LastOpened:= Now;
-    RegisteredDatabases[PtrInt(Node.Data)].OrigRegRec.LastOpened:= Now;
-    // Password form
-    if Rec.Password = '' then
-    if ConnectToDBAs(PtrInt(Node.Data)) then
-      Node.Expand(False)
-    else
-      Node.Collapse(False);
-  end
-  else  // Expand objects root (Tables, Procedures, etc)
-  if (Node.Parent <> nil) and (Node.Parent.Parent <> nil) and
-     (Node.Parent.Parent.Parent = nil) and (not Node.Expanded) then
-  begin
-    if Node.HasChildren then
+    if (Node.Parent <> nil) and (Node.Parent.Parent = nil) then   // Expand database
     begin
-      Node.DeleteChildren;
-      Node.Text:= Trim(Copy(Node.Text, 1, Pos('(', Node.Text) - 1));
+      Rec := RegisteredDatabases[PtrInt(Node.Data)].RegRec;
+      RegisteredDatabases[PtrInt(Node.Data)].RegRec.LastOpened := Now;
+      RegisteredDatabases[PtrInt(Node.Data)].OrigRegRec.LastOpened := Now;
+      // Password form
+      if Rec.Password = '' then
+        if ConnectToDBAs(PtrInt(Node.Data)) then
+          Node.Expand(False)
+        else
+          Node.Collapse(False);
+    end
+    else  // Expand objects root (Tables, Procedures, etc)
+    if (Node.Parent <> nil) and (Node.Parent.Parent <> nil) and
+      (Node.Parent.Parent.Parent = nil) and (not Node.Expanded) then
+    begin
+      if Node.HasChildren then
+      begin
+        Node.DeleteChildren;
+        Node.Text := Trim(Copy(Node.Text, 1, Pos('(', Node.Text) - 1));
+      end;
+      FillObjectRoot(Node);
     end;
-    FillObjectRoot(Node);
-  end;
 end;
 
-procedure TfmMain.GlobalException(Sender: TObject; E : Exception);
+procedure TfmMain.GlobalException(Sender: TObject; E: Exception);
 begin
-  MessageDlg('Exception', e.Message, mtError, [mbOk], 0);
+  MessageDlg('Exception', e.Message, mtError, [mbOK], 0);
 end;
 
 (**********************             Load databases            *********************************)
 
-function TfmMain.LoadRegisteredDatabases: Boolean;
+function TfmMain.LoadRegisteredDatabases: boolean;
 var
   Rec: TRegisteredDatabase;
   F: file of TRegisteredDatabase;
   FileName: string;
   MainNode, CNode: TTreeNode;
-  i: Integer;
+  i: integer;
   AServerName: string;
   ServerNode: TTreeNode;
+  Crypt: TCryptIniFile;
+  Sections: TStringList;
+  dbnr: integer;
 begin
   try
     tvMain.Items.Clear;
     ReleaseRegisteredDatabases;
-    FileName:= getConfigurationDirectory + 'turbobird.reg';
+
+    FileName := getConfigurationDirectory + 'turbobird.reg';
+    Sections := TStringList.Create;
+    Crypt := TCryptIniFile.Create(getConfigurationDirectory + 'turbobird1.reg');
 
     // Copy old configuration file
     if not FileExists(FileName) and (FileExists(ChangeFileExt(ParamStr(0), '.reg'))) then
@@ -4009,12 +4095,45 @@ begin
       CopyFile(ChangeFileExt(ParamStr(0), '.reg'), FileName);
     end;
 
+    Crypt.ReadSections(Sections);
+    SetLength(RegisteredDatabases, Sections.Count + 1);
+    for dbnr := 0 to Sections.Count - 1 do
+    begin
+      if not Crypt.ReadBool(Sections[dbnr], 'Deleted', False) then
+      begin
+        with RegisteredDatabases[dbnr] do
+        begin
+          rec.DatabaseName := Crypt.ReadString(Sections[dbnr], 'DatabaseName', '');
+          rec.Username := Crypt.ReadString(Sections[dbnr], 'UserName', '');
+          rec.Password := Crypt.ReadString(Sections[dbnr], 'Password', '');
+          rec.Role := Crypt.ReadString(Sections[dbnr], 'Role', '');
+          rec.Charset := Crypt.ReadString(Sections[dbnr], 'CharSet', '');
+          RegRec := Rec;
+          OrigRegRec := Rec;
+          IBConnection := TIBConnection.Create(nil);
+      {$IFDEF DEBUG}
+          ibConnection.OnLog := @GetLogEvent;
+          ibConnection.LogEvents := [detCustom, detExecute, detCommit, detRollBack];
+      {$ENDIF DEBUG}
+          SQLTrans := TSQLTransaction.Create(nil);
+          SetTransactionIsolation(SQLTrans.Params);
+          IBConnection.Transaction := SQLTrans;
+          SQLTrans.DataBase := IBConnection;
+          IBConnection.DatabaseName := Rec.DatabaseName;
+          IBConnection.UserName := Rec.UserName;
+          IBConnection.Password := Rec.Password;
+          IBConnection.Role := Rec.Role;
+          IBConnection.CharSet := Rec.Charset;
+        end;
+      end;
+    end;
+
     AssignFile(F, FileName);
     if FileExists(FileName) then
     begin
       Reset(F);
-      i:= 0;
-      while not Eof(F) do
+      i := 0;
+      while not EOF(F) do
       begin
         Read(F, Rec);
         if not Rec.Deleted then
@@ -4022,92 +4141,92 @@ begin
           SetLength(RegisteredDatabases, Length(RegisteredDatabases) + 1);
           with RegisteredDatabases[high(RegisteredDatabases)] do
           begin
-            RegRec:= Rec;
-            OrigRegRec:= Rec;
-            Index:= FilePos(F) - 1;
-            IBConnection:= TIBConnection.Create(nil);
+            RegRec := Rec;
+            OrigRegRec := Rec;
+            Index := FilePos(F) - 1;
+            IBConnection := TIBConnection.Create(nil);
             {$IFDEF DEBUG}
-            ibConnection.OnLog:=@GetLogEvent;
-            ibConnection.LogEvents:=[detCustom,detExecute,detCommit,detRollBack];
+            ibConnection.OnLog := @GetLogEvent;
+            ibConnection.LogEvents := [detCustom, detExecute, detCommit, detRollBack];
             {$ENDIF DEBUG}
-            SQLTrans:= TSQLTransaction.Create(nil);
+            SQLTrans := TSQLTransaction.Create(nil);
             SetTransactionIsolation(SQLTrans.Params);
 
-            IBConnection.Transaction:= SQLTrans;
-            SQLTrans.DataBase:= IBConnection;
-            IBConnection.DatabaseName:= Rec.DatabaseName;
-            IBConnection.UserName:= Rec.UserName;
-            IBConnection.Password:= Rec.Password;
-            IBConnection.Role:= Rec.Role;
-            IBConnection.CharSet:= Rec.Charset;
+            IBConnection.Transaction := SQLTrans;
+            SQLTrans.DataBase := IBConnection;
+            IBConnection.DatabaseName := Rec.DatabaseName;
+            IBConnection.UserName := Rec.UserName;
+            IBConnection.Password := Rec.Password;
+            IBConnection.Role := Rec.Role;
+            IBConnection.CharSet := Rec.Charset;
           end;
 
           // Server node
-          AServerName:= GetServerName(Rec.DatabaseName);
+          AServerName := GetServerName(Rec.DatabaseName);
 
-          ServerNode:= GetServerNameNode(AServerName);
+          ServerNode := GetServerNameNode(AServerName);
           if ServerNode = nil then // Add new Server node
           begin
             tvMain.Items.Add(nil, '');
-            ServerNode:= tvMain.Items.Add(nil, AServerName);
-            ServerNode.ImageIndex:= 25;
-            ServerNode.SelectedIndex:= 26;
+            ServerNode := tvMain.Items.Add(nil, AServerName);
+            ServerNode.ImageIndex := 25;
+            ServerNode.SelectedIndex := 26;
           end;
 
           // Display databases
-          MainNode:= tvMain.Items.AddChild(ServerNode, Rec.Title);
-          MainNode.ImageIndex:= 0;
-          MainNode.SelectedIndex:= 3;
-          MainNode.Data:= Pointer(i);
-          tvMain.PopupMenu:= pmDatabase;
+          MainNode := tvMain.Items.AddChild(ServerNode, Rec.Title);
+          MainNode.ImageIndex := 0;
+          MainNode.SelectedIndex := 3;
+          MainNode.Data := Pointer(i);
+          tvMain.PopupMenu := pmDatabase;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Query Window');
-          CNode.ImageIndex:= 1;
-          CNode.SelectedIndex:= 1;
+          CNode := tvMain.Items.AddChild(MainNode, 'Query Window');
+          CNode.ImageIndex := 1;
+          CNode.SelectedIndex := 1;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Tables');
-          CNode.ImageIndex:= 2;
-          CNode.SelectedIndex:= 2;
+          CNode := tvMain.Items.AddChild(MainNode, 'Tables');
+          CNode.ImageIndex := 2;
+          CNode.SelectedIndex := 2;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Generators');
-          CNode.ImageIndex:= 5;
-          CNode.SelectedIndex:= 5;
+          CNode := tvMain.Items.AddChild(MainNode, 'Generators');
+          CNode.ImageIndex := 5;
+          CNode.SelectedIndex := 5;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Triggers');
-          CNode.ImageIndex:= 7;
-          CNode.SelectedIndex:= 7;
+          CNode := tvMain.Items.AddChild(MainNode, 'Triggers');
+          CNode.ImageIndex := 7;
+          CNode.SelectedIndex := 7;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Views');
-          CNode.ImageIndex:= 9;
-          CNode.SelectedIndex:= 9;
+          CNode := tvMain.Items.AddChild(MainNode, 'Views');
+          CNode.ImageIndex := 9;
+          CNode.SelectedIndex := 9;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Stored Procedures');
-          CNode.ImageIndex:= 11;
-          CNode.SelectedIndex:= 11;
+          CNode := tvMain.Items.AddChild(MainNode, 'Stored Procedures');
+          CNode.ImageIndex := 11;
+          CNode.SelectedIndex := 11;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Functions');
-          CNode.ImageIndex:= 13;
-          CNode.SelectedIndex:= 13;
+          CNode := tvMain.Items.AddChild(MainNode, 'Functions');
+          CNode.ImageIndex := 13;
+          CNode.SelectedIndex := 13;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'System Tables');
-          CNode.ImageIndex:= 15;
-          CNode.SelectedIndex:= 15;
+          CNode := tvMain.Items.AddChild(MainNode, 'System Tables');
+          CNode.ImageIndex := 15;
+          CNode.SelectedIndex := 15;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Domains');
-          CNode.ImageIndex:= 17;
-          CNode.SelectedIndex:= 17;
+          CNode := tvMain.Items.AddChild(MainNode, 'Domains');
+          CNode.ImageIndex := 17;
+          CNode.SelectedIndex := 17;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Roles');
-          CNode.ImageIndex:= 19;
-          CNode.SelectedIndex:= 19;
+          CNode := tvMain.Items.AddChild(MainNode, 'Roles');
+          CNode.ImageIndex := 19;
+          CNode.SelectedIndex := 19;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Exceptions');
-          CNode.ImageIndex:= 21;
-          CNode.SelectedIndex:= 21;
+          CNode := tvMain.Items.AddChild(MainNode, 'Exceptions');
+          CNode.ImageIndex := 21;
+          CNode.SelectedIndex := 21;
 
-          CNode:= tvMain.Items.AddChild(MainNode, 'Users');
-          CNode.ImageIndex:= 23;
-          CNode.SelectedIndex:= 23;
+          CNode := tvMain.Items.AddChild(MainNode, 'Users');
+          CNode.ImageIndex := 23;
+          CNode.SelectedIndex := 23;
 
           Inc(i);
         end;
@@ -4119,11 +4238,11 @@ begin
       tvMain.Items.Add(nil, '');
       tvMain.Items.Add(nil, '');
     end;
-    Result:= True;
+    Result := True;
   except
     on E: Exception do
     begin
-      Result:= False;
+      Result := False;
       ShowMessage('Error: ' + E.Message);
     end;
   end;
@@ -4134,57 +4253,57 @@ end;
 
 function TfmMain.FindQueryWindow(ATitle: string): TComponent;
 var
-  i: Integer;
+  i: integer;
 begin
-  Result:= nil;
-  for i:= 0 to Application.ComponentCount- 1 do
+  Result := nil;
+  for i := 0 to Application.ComponentCount - 1 do
     if Application.Components[i] is TfmQueryWindow then
       if (Application.Components[i] as TfmQueryWindow).Caption = ATitle then
-        begin
-          Result:= Application.Components[i];
-          Break;
-        end;
+      begin
+        Result := Application.Components[i];
+        Break;
+      end;
 end;
 
 (**********************   Find CustomForm   *********************************)
 
 function TfmMain.FindCustomForm(ATitle: string; AClass: TClass): TComponent;
 var
-  i: Integer;
+  i: integer;
 begin
-  Result:= nil;
-  for i:= 0 to Application.ComponentCount- 1 do
+  Result := nil;
+  for i := 0 to Application.ComponentCount - 1 do
     if Application.Components[i] is AClass then
       if (Application.Components[i] as TForm).Caption = ATitle then
-        begin
-          Result:= Application.Components[i];
-          Break;
-        end;
+      begin
+        Result := Application.Components[i];
+        Break;
+      end;
 end;
 
 (****************  Delete Registration   *************************)
 
-function TfmMain.DeleteRegistration(Index: Integer): Boolean;
+function TfmMain.DeleteRegistration(Index: integer): boolean;
 var
   F: file of TRegisteredDatabase;
   Rec: TRegisteredDatabase;
   FileName: string;
 begin
-  Result:= False;
-  FileName:= getConfigurationDirectory + 'turbobird.reg';
+  Result := False;
+  FileName := getConfigurationDirectory + 'turbobird.reg';
 
   AssignFile(F, FileName);
   if FileExists(FileName) then
   begin
-    FileMode:= 2;
+    FileMode := 2;
     Reset(F);
     Seek(F, Index);
     Read(F, Rec);
-    Rec.Deleted:= True;
+    Rec.Deleted := True;
     Seek(F, Index);
     Write(F, Rec);
     CloseFile(F);
-    Result:= True;
+    Result := True;
   end;
 end;
 
@@ -4192,40 +4311,44 @@ function TfmMain.GetBlobSubTypeName(SubType: integer): string;
 begin
   case SubType of
     //<0: user-defined
-    0: Result:= 'SUB_TYPE BINARY';
-    1: Result:= 'SUB_TYPE TEXT';
-    2: Result:= 'SUB_TYPE BLR'; //(used for definitions of Firebird procedures, triggers, etc.
-    //>2: reserved by Firebird
-    else Result:= ''; //unknown
+    0: Result := 'SUB_TYPE BINARY';
+    1: Result := 'SUB_TYPE TEXT';
+    2: Result := 'SUB_TYPE BLR';
+      //(used for definitions of Firebird procedures, triggers, etc.
+      //>2: reserved by Firebird
+    else
+      Result := ''; //unknown
   end;
 end;
 
 
 (*******************  Get Primary Key fields  ************************)
 
-function TfmMain.GetPrimaryKeyIndexName(DatabaseIndex: Integer; ATableName: string; var ConstraintName: string): string;
+function TfmMain.GetPrimaryKeyIndexName(DatabaseIndex: integer;
+  ATableName: string; var ConstraintName: string): string;
 begin
   SQLQuery1.Close;
   SetConnection(DatabaseIndex);
-  SQLQuery1.SQL.Text:= 'select RDB$Index_name, RDB$Constraint_Name from RDB$RELATION_CONSTRAINTS ' +
-    'where RDB$Relation_Name = ''' + UpperCase(ATableName) + ''' and RDB$Constraint_Type = ''PRIMARY KEY'' ';
+  SQLQuery1.SQL.Text :=
+    'select RDB$Index_name, RDB$Constraint_Name from RDB$RELATION_CONSTRAINTS ' +
+    'where RDB$Relation_Name = ''' + UpperCase(ATableName) +
+    ''' and RDB$Constraint_Type = ''PRIMARY KEY'' ';
   SQLQuery1.Open;
   if SQLQuery1.RecordCount > 0 then
   begin
-    Result:= Trim(SQLQuery1.FieldByName('RDB$Index_name').AsString);
-    ConstraintName:= Trim(SQLQuery1.FieldByName('RDB$Constraint_Name').AsString);
+    Result := Trim(SQLQuery1.FieldByName('RDB$Index_name').AsString);
+    ConstraintName := Trim(SQLQuery1.FieldByName('RDB$Constraint_Name').AsString);
   end
   else
-    Result:= '';
+    Result := '';
   SQLQuery1.Close;
 end;
 
-function TfmMain.GetPrimaryKeyFields(DatabaseIndex: Integer;
+function TfmMain.GetPrimaryKeyFields(DatabaseIndex: integer;
   ATableName: string; var KeyFields: TStringList): boolean;
 const
   // Select field(s) that make up primary key
-  Template=' SELECT r.rdb$field_name ' +
-    ' FROM RDB$RELATION_FIELDS r ' +
+  Template = ' SELECT r.rdb$field_name ' + ' FROM RDB$RELATION_FIELDS r ' +
     ' LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME ' +
     ' LEFT JOIN RDB$INDEX_SEGMENTS s ON s.RDB$FIELD_NAME=r.RDB$FIELD_NAME ' +
     ' LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME ' +
@@ -4236,38 +4359,39 @@ const
     ' WHERE r.RDB$RELATION_NAME=''%s'' AND ' +
     ' rc.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' ';
 begin
-  result:= false;
+  Result := False;
   KeyFields.Clear;
   SQLQuery1.Close;
   SetConnection(DatabaseIndex);
-  SQLQuery1.SQL.Text:=format(Template,[UpperCase(ATableName)]);
+  SQLQuery1.SQL.Text := format(Template, [UpperCase(ATableName)]);
   SQLQuery1.Open;
-  while not(SQLQuery1.EOF) do
+  while not (SQLQuery1.EOF) do
   begin
     KeyFields.Add(Trim(SQLQuery1.FieldByName('rdb$field_name').AsString));
     SQLQuery1.Next;
   end;
   SQLQuery1.Close;
-  result:= true;
+  Result := True;
 end;
 
 (*********  Get constrain fields  *********)
 
-function TfmMain.GetConstraintFields(ATableName, AIndexName: string; var List: TStringList): Boolean;
+function TfmMain.GetConstraintFields(ATableName, AIndexName: string;
+  var List: TStringList): boolean;
 begin
   SQLQuery1.Close;
-  SQLQuery1.SQL.Text:= 'SELECT s.RDB$FIELD_NAME AS field_name ' +
-     'FROM RDB$INDEX_SEGMENTS s ' +
-     'LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME ' +
-     'LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME ' +
-     'LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME ' +
-     'LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ ' +
-     'LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME ' +
-     'LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME ' +
-     '   WHERE i.RDB$RELATION_NAME=''' + UpperCase(ATableName) + '''  ' +
-      'AND rc.RDB$INDEX_NAME=''' + UpperCase(AIndexName) + ''' ' +
-      'AND rc.RDB$CONSTRAINT_TYPE IS NOT NULL ' +
-      'ORDER BY s.RDB$FIELD_POSITION';
+  SQLQuery1.SQL.Text := 'SELECT s.RDB$FIELD_NAME AS field_name ' +
+    'FROM RDB$INDEX_SEGMENTS s ' +
+    'LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME ' +
+    'LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME ' +
+    'LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME '
+    + 'LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ '
+    + 'LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME ' +
+    'LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME ' +
+    '   WHERE i.RDB$RELATION_NAME=''' + UpperCase(ATableName) +
+    '''  ' + 'AND rc.RDB$INDEX_NAME=''' + UpperCase(AIndexName) +
+    ''' ' + 'AND rc.RDB$CONSTRAINT_TYPE IS NOT NULL ' +
+    'ORDER BY s.RDB$FIELD_POSITION';
   List.Clear;
   SQLQuery1.Open;
   while not SQLQuery1.EOF do
@@ -4276,20 +4400,19 @@ begin
     SQLQuery1.Next;
   end;
   SQLQuery1.Close;
-  Result:= List.Count > 0;
+  Result := List.Count > 0;
 end;
 
 (********  Get table names   ********)
 
-function TfmMain.GetTableNames(dbIndex: Integer): string;
+function TfmMain.GetTableNames(dbIndex: integer): string;
 var
-  Count: Integer;
+  Count: integer;
 begin
-  Result:= dmSysTables.GetDBObjectNames(dbIndex, otTables, Count);
+  Result := dmSysTables.GetDBObjectNames(dbIndex, otTables, Count);
 end;
 
 initialization
   {$I main.lrs}
 
 end.
-

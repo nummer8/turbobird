@@ -1,7 +1,0 @@
-/home/jos/Documents/lazarus_projecten/turbobird/TurboBird --debug-log=log.txt 
-Heap dump by heaptrc unit of /home/jos/Documents/lazarus_projecten/turbobird/TurboBird
-4 memory blocks allocated : 815/832
-4 memory blocks freed     : 815/832
-0 unfreed memory blocks : 0
-True heap size : 360448
-True free heap : 360448
