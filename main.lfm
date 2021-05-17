@@ -5,7 +5,7 @@ object fmMain: TfmMain
   Width = 1152
   ActiveControl = PageControl1
   Caption = 'TurboBird Admin for FireBird'
-  ClientHeight = 610
+  ClientHeight = 611
   ClientWidth = 1152
   Color = clForm
   Font.Name = 'Sans'
@@ -548,11 +548,11 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.0.10.0'
   WindowState = wsMaximized
   object tvMain: TTreeView
     Left = 0
-    Height = 550
+    Height = 548
     Top = 40
     Width = 304
     Align = alLeft
@@ -572,14 +572,14 @@ object fmMain: TfmMain
   end
   object Splitter1: TSplitter
     Left = 304
-    Height = 550
+    Height = 548
     Top = 40
     Width = 14
     Beveled = True
   end
   object PageControl1: TPageControl
     Left = 321
-    Height = 543
+    Height = 541
     Top = 43
     Width = 828
     ActivePage = TabSheet1
@@ -599,8 +599,8 @@ object fmMain: TfmMain
     object TabSheet1: TTabSheet
       BorderWidth = 1
       Caption = 'Main'
-      ClientHeight = 509
-      ClientWidth = 822
+      ClientHeight = 510
+      ClientWidth = 820
       Font.Color = clNavy
       Font.Name = 'Arial'
       ParentFont = False
@@ -608,7 +608,7 @@ object fmMain: TfmMain
         Left = 352
         Height = 82
         Top = 216
-        Width = 212
+        Width = 210
         Anchors = [akTop, akLeft, akRight]
         Picture.Data = {
           0A544A706567496D6167655F420000FFD8FFE000104A46494600010101006000
@@ -1149,8 +1149,8 @@ object fmMain: TfmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 20
-    Top = 590
+    Height = 23
+    Top = 588
     Width = 1152
     Panels = <    
       item

@@ -149,6 +149,7 @@ begin
   if (ComparedDBIndex <> -1) then
   begin
     Connected:= True;
+
     if (fmMain.RegisteredDatabases[ComparedDBIndex].RegRec.Password = '') then
       Connected:= fmMain.ConnectToDBAs(ComparedDBIndex);
 
@@ -663,12 +664,10 @@ begin
         meLog.Lines.Add('Checking Missing ' + dbObjects[ord(ObjectType)] + ':');
 
         List.CommaText:= dmSysTables.GetDBObjectNames(FDBIndex, ObjectType, Count);
-        List.SaveToFile('/home/jos/Documents/list.txt');
         Application.ProcessMessages;
         if FCanceled then
           Exit;
         ComparedList.CommaText:= dmSysTables.GetDBObjectNames(cbComparedDatabase.ItemIndex, ObjectType, Count);
-        ComparedList.SaveToFile('/home/jos/Documents/Comparedlist.txt');
         FDBObjectsList[ord(ObjectType)].Clear;
         FDBExistingObjectsList[ord(ObjectType)].Clear;
         for i:= 0 to List.Count -1 do

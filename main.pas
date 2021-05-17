@@ -13,7 +13,7 @@ uses
   Classes, SysUtils, IBConnection, sqldb, sqldblib, memds, FileUtil, LResources,
   Forms, Controls, Graphics, Dialogs, Menus, ComCtrls, Reg, QueryWindow, Grids,
   ExtCtrls, Buttons, StdCtrls, TableManage, dbugintf, turbocommon, importtable,
-  IniFiles, uCryptIni;
+  IniFiles, base64;
 
 {$i turbocommon.inc}
 
@@ -4077,55 +4077,16 @@ var
   i: integer;
   AServerName: string;
   ServerNode: TTreeNode;
-  Crypt: TCryptIniFile;
-  Sections: TStringList;
-  dbnr: integer;
 begin
   try
     tvMain.Items.Clear;
     ReleaseRegisteredDatabases;
-
-    FileName := getConfigurationDirectory + 'turbobird.reg';
-    Sections := TStringList.Create;
-    Crypt := TCryptIniFile.Create(getConfigurationDirectory + 'turbobird1.reg');
+    FileName:= fmMain.getConfigurationDirectory + 'turbobird.reg';
 
     // Copy old configuration file
     if not FileExists(FileName) and (FileExists(ChangeFileExt(ParamStr(0), '.reg'))) then
     begin
       CopyFile(ChangeFileExt(ParamStr(0), '.reg'), FileName);
-    end;
-
-    Crypt.ReadSections(Sections);
-    SetLength(RegisteredDatabases, Sections.Count + 1);
-    for dbnr := 0 to Sections.Count - 1 do
-    begin
-      if not Crypt.ReadBool(Sections[dbnr], 'Deleted', False) then
-      begin
-        with RegisteredDatabases[dbnr] do
-        begin
-          rec.DatabaseName := Crypt.ReadString(Sections[dbnr], 'DatabaseName', '');
-          rec.Username := Crypt.ReadString(Sections[dbnr], 'UserName', '');
-          rec.Password := Crypt.ReadString(Sections[dbnr], 'Password', '');
-          rec.Role := Crypt.ReadString(Sections[dbnr], 'Role', '');
-          rec.Charset := Crypt.ReadString(Sections[dbnr], 'CharSet', '');
-          RegRec := Rec;
-          OrigRegRec := Rec;
-          IBConnection := TIBConnection.Create(nil);
-      {$IFDEF DEBUG}
-          ibConnection.OnLog := @GetLogEvent;
-          ibConnection.LogEvents := [detCustom, detExecute, detCommit, detRollBack];
-      {$ENDIF DEBUG}
-          SQLTrans := TSQLTransaction.Create(nil);
-          SetTransactionIsolation(SQLTrans.Params);
-          IBConnection.Transaction := SQLTrans;
-          SQLTrans.DataBase := IBConnection;
-          IBConnection.DatabaseName := Rec.DatabaseName;
-          IBConnection.UserName := Rec.UserName;
-          IBConnection.Password := Rec.Password;
-          IBConnection.Role := Rec.Role;
-          IBConnection.CharSet := Rec.Charset;
-        end;
-      end;
     end;
 
     AssignFile(F, FileName);
@@ -4141,6 +4102,8 @@ begin
           SetLength(RegisteredDatabases, Length(RegisteredDatabases) + 1);
           with RegisteredDatabases[high(RegisteredDatabases)] do
           begin
+            Rec.Password:= DecodeStringBase64(Rec.Password);
+            Rec.Password:= Crypt(Rec.Password);
             RegRec := Rec;
             OrigRegRec := Rec;
             Index := FilePos(F) - 1;

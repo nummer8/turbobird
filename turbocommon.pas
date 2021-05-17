@@ -281,7 +281,24 @@ function IsPrimaryIndexSystemGenerated(IndexName: string): boolean;
 // Given TIBConnection parameters, sets transaction isolation level
 procedure SetTransactionIsolation(Params: TStringList);
 
+//function to encrypt en decrypt password
+function Crypt(const aText: string): string;
+
 implementation
+
+function Crypt(const aText: string): string;
+const
+  PWD = 'http://forum.lazarus.freepascal.org/index.php/topic,33013.msg213192.html#msg213192';
+var
+  i, len: integer;
+begin
+  len := Length(aText);
+  if len > Length(PWD) then
+    len := Length(PWD);
+  SetLength(Result, len);
+  for i := 1 to len do
+    Result[i] := Chr(Ord(aText[i]) xor Ord(PWD[i]));
+end;
 
 function GetCollations(const Characterset: string; var Collations: TStringList): boolean;
 var

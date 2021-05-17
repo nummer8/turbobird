@@ -10,12 +10,12 @@ object fmReg: TfmReg
   ClientWidth = 500
   Color = clForm
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.0.10.0'
   object Label1: TLabel
     Left = 170
     Height = 15
     Top = 56
-    Width = 113
+    Width = 87
     Caption = 'server : database'
     ParentColor = False
   end
@@ -23,7 +23,7 @@ object fmReg: TfmReg
     Left = 170
     Height = 15
     Top = 104
-    Width = 71
+    Width = 56
     Caption = 'User name'
     ParentColor = False
   end
@@ -31,7 +31,7 @@ object fmReg: TfmReg
     Left = 320
     Height = 15
     Top = 104
-    Width = 61
+    Width = 50
     Caption = 'Password'
     ParentColor = False
   end
@@ -39,7 +39,7 @@ object fmReg: TfmReg
     Left = 170
     Height = 15
     Top = 8
-    Width = 29
+    Width = 22
     Caption = 'Title'
     ParentColor = False
   end
@@ -47,7 +47,7 @@ object fmReg: TfmReg
     Left = 170
     Height = 15
     Top = 184
-    Width = 50
+    Width = 40
     Caption = 'Charset'
     ParentColor = False
   end
@@ -55,13 +55,13 @@ object fmReg: TfmReg
     Left = 320
     Height = 15
     Top = 184
-    Width = 29
+    Width = 23
     Caption = 'Role'
     ParentColor = False
   end
   object edDatabaseName: TEdit
     Left = 170
-    Height = 26
+    Height = 23
     Top = 72
     Width = 289
     TabOrder = 1
@@ -77,14 +77,14 @@ object fmReg: TfmReg
   end
   object edUserName: TEdit
     Left = 170
-    Height = 26
+    Height = 23
     Top = 128
     Width = 145
     TabOrder = 3
   end
   object edPassword: TEdit
     Left = 320
-    Height = 26
+    Height = 23
     Top = 128
     Width = 139
     EchoMode = emPassword
@@ -191,7 +191,7 @@ object fmReg: TfmReg
   end
   object edTitle: TEdit
     Left = 170
-    Height = 26
+    Height = 23
     Top = 24
     Width = 321
     TabOrder = 0
@@ -209,25 +209,25 @@ object fmReg: TfmReg
   end
   object cxSavePassword: TCheckBox
     Left = 320
-    Height = 21
+    Height = 19
     Top = 152
-    Width = 120
+    Width = 97
     Caption = 'Save Password'
     TabOrder = 5
   end
   object edRole: TEdit
     Left = 320
-    Height = 26
+    Height = 23
     Top = 200
     Width = 171
     TabOrder = 7
   end
   object cbCharset: TComboBox
     Left = 170
-    Height = 26
+    Height = 23
     Top = 200
     Width = 143
-    ItemHeight = 0
+    ItemHeight = 15
     ItemIndex = 0
     Items.Strings = (
       'NONE'

@@ -1,0 +1,178 @@
+C:\Lazarus_projecten\TurboBird_Git\turbobird\TurboBird.exe --debug-log=log.txt 
+Heap dump by heaptrc unit of C:\Lazarus_projecten\TurboBird_Git\turbobird\TurboBird.exe
+492331 memory blocks allocated : 60569511/62333280
+492230 memory blocks freed     : 60559939/62323512
+101 unfreed memory blocks : 9572
+True heap size : 2228224 (224 used in System startup)
+True free heap : 2196608
+Should be : 2198840
+Call trace for block $00000000076FD970 size 256
+  $0000000100012312
+  $00000001000EC19E
+  $00000001000EBBFC
+  $00000001000EBED4
+  $00000001000EBE94
+  $00000001000EC3B6
+  $00000001000BDBD3  CHECKMISSINGDBOBJECTS,  line 682 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+Call trace for block $0000000007850360 size 39
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $0000000007850060 size 39
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $0000000007850260 size 46
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $000000000784E060 size 41
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $000000000784C060 size 39
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $000000000783C2A0 size 64
+  $0000000100012312
+  $00000001000EC19E
+  $00000001000EBBFC
+  $00000001000EBED4
+  $00000001000EBE94
+  $00000001000EC3B6
+  $00000001000BDBD3  CHECKMISSINGDBOBJECTS,  line 682 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+Call trace for block $000000000784C760 size 34
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
+Call trace for block $0000000004F6BCA0 size 1024
+  $0000000100012312
+  $00000001000EC19E
+  $00000001000EBBFC
+  $00000001000EBED4
+  $00000001000EBE94
+  $00000001000EC3B6
+  $00000001000BDBD3  CHECKMISSINGDBOBJECTS,  line 682 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+Call trace for block $000000000784C960 size 34
+  $0000000100012312
+  $0000000100009BE3
+  $000000010000AD91
+  $00000001000E9354
+  $00000001000E95AB
+  $00000001000BD7C4  CHECKMISSINGDBOBJECTS,  line 666 of comparison.pas
+  $00000001000B93C5  BBSTARTCLICK,  line 184 of comparison.pas
+  $000000010004FF67  CLICK,  line 2911 of include/control.inc
+  $00000001001C2DC9  CLICK,  line 55 of include/buttoncontrol.inc
+  $00000001001C34C9  CLICK,  line 169 of include/buttons.inc
+  $00000001001ABBD9  CLICK,  line 67 of include/bitbtn.inc
+  $00000001001C2CC2  WMDEFAULTCLICKED,  line 21 of include/buttoncontrol.inc
+  $000000010000F541
+  $000000010004ED31  WNDPROC,  line 2241 of include/control.inc
+  $0000000100043149  WNDPROC,  line 5411 of include/wincontrol.inc
+  $0000000100242EF9  DELIVERMESSAGE,  line 112 of lclmessageglue.pas
